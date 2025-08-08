@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Пионер-лагерь «ШАГАЙ ДОМА» — карта</title>
+<style>
+  body{margin:0;background:#fff;font-family:system-ui,Arial,sans-serif}
+  .map-wrap{max-width:1200px;margin:0 auto}
+  /* Включите fill для дебага зон (и/или увеличьте stroke) */
+  .hotspot{fill:transparent;stroke:rgba(207,44,2,.25);stroke-width:2;cursor:pointer}
+  image{pointer-events:none} /* чтобы клики шли в hotspot, а не в <image> */
+</style>
+</head>
+<body>
+<div class="map-wrap">
+  <svg viewBox="0 0 1536 1156" width="100%" preserveAspectRatio="xMidYMid meet">
+    <!-- карта -->
+    <image href="camp-map.jpg" width="1536" height="1156" />
+
+    <!-- СТОЛОВАЯ -->
+    <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696518" target="_blank" rel="noopener">
+      <!-- дом -->
+      <polygon class="hotspot" points="316.2,240.8 542.1,240.8 572.2,401.4 331.3,441.5 286.1,361.3">
+        <title>Столовая</title>
+      </polygon>
+      <!-- плашка с надписью -->
+      <rect class="hotspot" x="195.8" y="541.9" width="331.3" height="88.3" rx="12" />
+    </a>
+
+    <!-- СПОРТИВНЫЙ ЗАЛ -->
+    <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696520" target="_blank" rel="noopener">
+      <polygon class="hotspot" points="647.5,481.7 903.5,481.7 918.6,662.3 677.6,662.3 662.6,561.9">
+        <title>Спортивный зал</title>
+      </polygon>
+      <rect class="hotspot" x="692.7" y="662.3" width="376.5" height="88.3" rx="12" />
+    </a>
+
+    <!-- ДИСКОТЕКА -->
+    <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696522" target="_blank" rel="noopener">
+      <polygon class="hotspot" points="1024.0,401.4 1234.8,381.3 1249.9,551.9 1054.1,572.0">
+        <title>Дискотека</title>
+      </polygon>
+      <rect class="hotspot" x="1084.2" y="521.8" width="346.4" height="88.3" rx="12" />
+    </a>
+
+    <!-- ПАЛАТЫ -->
+    <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696523" target="_blank" rel="noopener">
+      <polygon class="hotspot" points="150.6,602.1 391.5,602.1 436.7,722.5 120.5,722.5">
+        <title>Палаты</title>
+      </polygon>
+      <rect class="hotspot" x="165.6" y="742.6" width="331.3" height="88.3" rx="12" />
+    </a>
+
+    <!-- БЕСЕДКА -->
+    <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696533" target="_blank" rel="noopener">
+      <polygon class="hotspot" points="180.7,883.1 301.2,842.9 361.4,923.2 240.9,963.3">
+        <title>Беседка</title>
+      </polygon>
+      <rect class="hotspot" x="180.7" y="1003.5" width="301.2" height="88.3" rx="12" />
+    </a>
+
+    <!-- КИНОЗАЛ -->
+    <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696534" target="_blank" rel="noopener">
+      <polygon class="hotspot" points="1084.2,722.5 1249.9,722.5 1295.1,863.0 1114.4,863.0">
+        <title>Кинозал</title>
+      </polygon>
+      <rect class="hotspot" x="1144.5" y="842.9" width="331.3" height="88.3" rx="12" />
+    </a>
+
+    <!-- КОМНАТЫ ОТДЫХА -->
+    <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696535" target="_blank" rel="noopener">
+      <polygon class="hotspot" points="963.8,963.3 1189.6,963.3 1234.8,1083.8 933.6,1083.8">
+        <title>Комнаты отдыха</title>
+      </polygon>
+      <rect class="hotspot" x="1054.1" y="1043.6" width="391.5" height="88.3" rx="12" />
+    </a>
+  </svg>
+</div>
+</body>
+</html>
