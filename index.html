@@ -7,30 +7,38 @@
 <style>
   :root{
     --brand:#CF2C02;
-    --house:#0aa;       /* домики в режиме разметки */
-    --label:#CF2C02;    /* таблички в режиме разметки */
+    --house:#0aa;       /* домики (бирюзовый) в режиме разметки */
+    --label:#CF2C02;    /* таблички (красный) в режиме разметки */
   }
-  body{margin:0;background:#fff;font-family:system-ui, Arial, sans-serif}
+  * { box-sizing: border-box }
+  body{margin:0;background:#fff;font-family:system-ui, Arial, sans-serif; user-select:none}
   .wrap{max-width:1200px;margin:0 auto;position:relative}
   svg{display:block;width:100%;height:auto;background:#fff}
-  image{pointer-events:none}            /* клики идут в hotspot'ы, а не в <image> */
+  image{pointer-events:none} /* клики идут в hotspot'ы, а не в <image> */
 
-  /* Кликабельные зоны в обычном режиме */
-  .hotspot{fill:transparent;stroke:transparent;stroke-width:2;cursor:pointer}
+  /* Кликабельные зоны в обычном режиме (невидимы, но кликабельны) */
+  .hotspot{fill:transparent;stroke:transparent;stroke-width:2;cursor:pointer; vector-effect: non-scaling-stroke;}
 
-  /* Режим разметки (подсветка) */
-  .edit .hotspot[data-type="label"]{fill:rgba(207,44,2,.12);stroke:var(--label)}
-  .edit .hotspot[data-type="house"]{fill:rgba(0,170,170,.12);stroke:var(--house)}
-  .handle{display:none}
-  .edit .handle{display:block;fill:#fff;stroke:#333;stroke-width:1;cursor:grab}
-  .edit .handle:active{cursor:grabbing}
+  /* В режиме разметки подсветка + отключаем переходы по ссылкам */
+  .edit .hotspot[data-type="label"]{fill:rgba(207,44,2,.14);stroke:var(--label)}
+  .edit .hotspot[data-type="house"]{fill:rgba(0,170,170,.14);stroke:var(--house)}
+  .edit a{ pointer-events: none; } /* чтобы тап/клик не вёл по ссылке во время разметки */
+
+  /* Ручки (маркеры) */
+  .handle{
+    display:none;
+    fill:#fff; stroke:#333; stroke-width:1.2;
+    cursor:grab; touch-action:none;
+  }
+  .edit .handle{ display:block; }
+  .handle:active{ cursor:grabbing; }
 
   /* Панель */
   .toolbar{
     position:sticky; top:0; z-index:10;
     display:flex; gap:.5rem; padding:.75rem 1rem;
     backdrop-filter:saturate(1.2) blur(4px);
-    background:linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.8));
+    background:linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.85));
     border-bottom:1px solid #eee;
   }
   .toolbar button{
@@ -52,24 +60,26 @@
 <div class="toolbar">
   <button id="toggleEdit">Режим разметки</button>
   <button id="copyBtn" class="ghost">Скопировать зоны</button>
-  <div class="tip">Подсказка: нажмите <b>E</b> для вкл/выкл режима разметки • тяните маркеры</div>
+  <div class="tip">Подсказка: нажмите <b>E</b> (ПК) • Тяните круглые маркеры (центральный — переносит зону)</div>
 </div>
 
 <div class="wrap">
-  <!-- ВАЖНО: используем ваш нативный размер 1536 × 1156 -->
+  <!-- Ваш нативный размер: 1536 × 1156 -->
   <svg id="camp" viewBox="0 0 1536 1156" preserveAspectRatio="xMidYMid meet">
     <image href="camp-map.jpg" width="1536" height="1156" />
 
-    <!-- ========= ЗОНЫ (ТАБЛИЧКИ + ДОМИКИ) =========
-         Координаты примерные — вы их дотянете маркерами.
-         data-type="label" для табличек; "house" для домиков.
+    <!-- ===== ЗОНЫ (ТАБЛИЧКИ + ДОМИКИ) =====
+         data-type="label" для табличек (красные в edit),
+         data-type="house" для домиков (бирюзовые в edit).
+         Координаты примерные — подгоните маркерами.
     -->
 
     <!-- СТОЛОВАЯ -->
     <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696518" target="_blank" rel="noopener">
+      <!-- табличка -->
       <rect class="hotspot" data-type="label" data-id="label-stolovaya"
             x="200" y="538" width="330" height="90" rx="16"/>
-      <!-- домик как полигон -->
+      <!-- домик -->
       <polygon class="hotspot" data-type="house" data-id="house-stolovaya"
                points="320,250 545,250 575,400 335,440 290,365"/>
     </a>
@@ -122,7 +132,7 @@
                points="966,964 1190,964 1236,1084 934,1084"/>
     </a>
 
-    <!-- сюда динамически подставятся ручки -->
+    <!-- сюда динамически добавятся ручки -->
     <g id="handles"></g>
   </svg>
 
@@ -135,106 +145,119 @@
   const btnEdit = document.getElementById('toggleEdit');
   const btnCopy = document.getElementById('copyBtn');
   const output = document.getElementById('output');
-  let edit = false;
-  let drag = null; // {el, shape, idx, type}
 
-  // helpers
+  const HANDLE_R = window.matchMedia('(pointer:coarse)').matches ? 14 : 8;
+
+  let editMode = false;
+  let drag = null; // {ref, kind, idx, prevX, prevY}
+
   function svgPoint(evt){
     const pt = svg.createSVGPoint();
     pt.x = (evt.touches ? evt.touches[0].clientX : evt.clientX);
     pt.y = (evt.touches ? evt.touches[0].clientY : evt.clientY);
     return pt.matrixTransform(svg.getScreenCTM().inverse());
   }
-
-  function enterEdit(){
-    document.body.classList.add('edit');
-    edit = true;
-    drawHandles();
-  }
-  function exitEdit(){
-    document.body.classList.remove('edit');
-    edit = false;
-    handlesLayer.innerHTML = '';
-  }
-
-  btnEdit.addEventListener('click', ()=> edit ? exitEdit() : enterEdit());
-  document.addEventListener('keydown', e=>{
-    if(e.key.toLowerCase()==='e') (edit?exitEdit():enterEdit());
-  });
-
-  function drawHandles(){
-    handlesLayer.innerHTML='';
-    const shapes = svg.querySelectorAll('.hotspot');
-    shapes.forEach(sh=>{
-      if(sh.tagName==='polygon'){
-        const pts = sh.getAttribute('points').trim().split(/\s+/).map(p=>p.split(',').map(Number));
-        pts.forEach((p,i)=>{
-          const c = circle(p[0], p[1], sh, i, 'poly');
-          c.style.stroke = sh.dataset.type==='label' ? 'var(--label)' : 'var(--house)';
-          handlesLayer.appendChild(c);
-        });
-      }else if(sh.tagName==='rect'){
-        const x=+sh.getAttribute('x'), y=+sh.getAttribute('y'),
-              w=+sh.getAttribute('width'), h=+sh.getAttribute('height');
-        const corners = [[x,y],[x+w,y],[x+w,y+h],[x,y+h]];
-        corners.forEach((p,i)=>{
-          const c = circle(p[0], p[1], sh, i, 'rect');
-          c.style.stroke = 'var(--label)';
-          handlesLayer.appendChild(c);
-        });
-      }
-    });
-  }
-
-  function circle(cx,cy, shape, idx, type){
-    const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
-    c.setAttribute('class','handle');
-    c.setAttribute('r',8);
-    c.setAttribute('cx',cx);
-    c.setAttribute('cy',cy);
-    c.dataset.idx = idx;
-    c.dataset.ref = getRef(shape);
-    c.dataset.kind = type;
-    c.addEventListener('pointerdown', startDrag);
-    c.addEventListener('touchstart', startDrag, {passive:false});
-    return c;
-  }
   function getRef(shape){
-    // create a stable selector
     return shape.dataset.id || (shape.dataset.id = 'sh'+Math.random().toString(36).slice(2));
   }
   function findShape(ref){
     return svg.querySelector('.hotspot[data-id="'+ref+'"]');
   }
 
+  function circle(cx,cy, shape, idx, kind, strokeColor){
+    const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('class','handle');
+    c.setAttribute('r', HANDLE_R);
+    c.setAttribute('cx',cx);
+    c.setAttribute('cy',cy);
+    c.dataset.idx = idx;           // -1 = центр (перемещение)
+    c.dataset.ref = getRef(shape);
+    c.dataset.kind = kind;         // 'poly'|'rect'|'move-poly'|'move-rect'
+    c.style.stroke = strokeColor || '#333';
+    c.style.fill = '#fff';
+    c.addEventListener('pointerdown', startDrag);
+    c.addEventListener('touchstart', startDrag, {passive:false});
+    return c;
+  }
+
+  function drawHandles(){
+    handlesLayer.innerHTML='';
+    const shapes = svg.querySelectorAll('.hotspot');
+    shapes.forEach(sh=>{
+      const stroke = sh.dataset.type==='label' ? 'var(--label)' : 'var(--house)';
+      if(sh.tagName==='polygon'){
+        // точки полигона
+        const pts = sh.getAttribute('points').trim().split(/\s+/).map(p=>p.split(',').map(Number));
+        pts.forEach((p,i)=>{
+          handlesLayer.appendChild(circle(p[0], p[1], sh, i, 'poly', stroke));
+        });
+        // центральная ручка для перемещения всего полигона
+        const cx = pts.reduce((a,p)=>a+p[0],0)/pts.length;
+        const cy = pts.reduce((a,p)=>a+p[1],0)/pts.length;
+        handlesLayer.appendChild(circle(cx, cy, sh, -1, 'move-poly', stroke));
+      } else if(sh.tagName==='rect'){
+        // углы
+        const x=+sh.getAttribute('x'), y=+sh.getAttribute('y'),
+              w=+sh.getAttribute('width'), h=+sh.getAttribute('height');
+        const corners = [[x,y],[x+w,y],[x+w,y+h],[x,y+h]];
+        corners.forEach((p,i)=>{
+          handlesLayer.appendChild(circle(p[0], p[1], sh, i, 'rect', 'var(--label)'));
+        });
+        // центральная ручка для перемещения всего прямоугольника
+        const cxMid = x + w/2, cyMid = y + h/2;
+        handlesLayer.appendChild(circle(cxMid, cyMid, sh, -1, 'move-rect', 'var(--label)'));
+      }
+    });
+  }
+
   function startDrag(e){
     e.preventDefault();
-    const cx = +this.getAttribute('cx');
-    const cy = +this.getAttribute('cy');
+    const p = svgPoint(e);
     drag = {
-      el: this,
-      idx: +this.dataset.idx,
+      ref: this.dataset.ref,
       kind: this.dataset.kind,
-      ref: this.dataset.ref
+      idx: +this.dataset.idx,
+      prevX: p.x,
+      prevY: p.y
     };
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', endDrag);
     window.addEventListener('touchmove', onMove, {passive:false});
     window.addEventListener('touchend', endDrag);
   }
+
   function onMove(e){
     if(!drag) return;
     e.preventDefault();
     const p = svgPoint(e);
-    drag.el.setAttribute('cx', p.x);
-    drag.el.setAttribute('cy', p.y);
+    const dx = p.x - drag.prevX;
+    const dy = p.y - drag.prevY;
     const shape = findShape(drag.ref);
-    if(drag.kind==='poly'){
+
+    if(drag.kind==='poly' && drag.idx>=0){
+      // перемещение вершины полигона
       const pts = shape.getAttribute('points').trim().split(/\s+/).map(s=>s.split(',').map(Number));
       pts[drag.idx] = [p.x, p.y];
       shape.setAttribute('points', pts.map(a=>a.join(',')).join(' '));
-    }else{
-      // rect: corners order TL, TR, BR, BL
+      // сдвигаем конкретную ручку
+      const handle = dragHandle(drag.ref, drag.idx);
+      if(handle){ handle.setAttribute('cx', p.x); handle.setAttribute('cy', p.y); }
+      // центральную тоже перерисуем
+      redrawCenterHandleForPoly(drag.ref, pts);
+    }
+    else if(drag.kind==='move-poly'){
+      // перенос полигона целиком
+      const pts = shape.getAttribute('points').trim().split(/\s+/).map(s=>s.split(',').map(Number));
+      const moved = pts.map(([x,y])=>[x+dx,y+dy]);
+      shape.setAttribute('points', moved.map(a=>a.join(',')).join(' '));
+      // сдвигаем все ручки этого полигона
+      handlesOfRef(drag.ref).forEach(h=>{
+        h.setAttribute('cx', +h.getAttribute('cx') + dx);
+        h.setAttribute('cy', +h.getAttribute('cy') + dy);
+      });
+    }
+    else if(drag.kind==='rect' && drag.idx>=0){
+      // изменение размера прямоугольника по углам
       const rect = shape;
       let x = +rect.getAttribute('x'),
           y = +rect.getAttribute('y'),
@@ -242,18 +265,35 @@
           h = +rect.getAttribute('height');
       let corners = [[x,y],[x+w,y],[x+w,y+h],[x,y+h]];
       corners[drag.idx] = [p.x, p.y];
-      // recompute rect from new TL/BR (min/max)
       const xs = corners.map(c=>c[0]), ys = corners.map(c=>c[1]);
       const nx = Math.min(...xs), ny = Math.min(...ys),
             nw = Math.max(...xs) - nx, nh = Math.max(...ys) - ny;
       rect.setAttribute('x', nx); rect.setAttribute('y', ny);
       rect.setAttribute('width', nw); rect.setAttribute('height', nh);
-      // update all 4 handles of this rect
-      const myHandles = [...handlesLayer.querySelectorAll('.handle')].filter(h=>h.dataset.ref===drag.ref);
+      // обновляем все 5 ручек (4 угла + центр)
+      const hs = handlesOfRef(drag.ref);
       const newCorners = [[nx,ny],[nx+nw,ny],[nx+nw,ny+nh],[nx,ny+nh]];
-      myHandles.forEach((h,i)=>{ h.setAttribute('cx',newCorners[i][0]); h.setAttribute('cy',newCorners[i][1]); });
+      // первые 4 — углы
+      hs.slice(0,4).forEach((h,i)=>{ h.setAttribute('cx',newCorners[i][0]); h.setAttribute('cy',newCorners[i][1]); });
+      // последняя — центр
+      const cxMid = nx + nw/2, cyMid = ny + nh/2;
+      hs[4].setAttribute('cx',cxMid); hs[4].setAttribute('cy',cyMid);
     }
+    else if(drag.kind==='move-rect'){
+      // перенос прямоугольника целиком
+      const rect = shape;
+      const x = +rect.getAttribute('x'), y = +rect.getAttribute('y');
+      rect.setAttribute('x', x+dx); rect.setAttribute('y', y+dy);
+      // сдвигаем все ручки этого прямоугольника
+      handlesOfRef(drag.ref).forEach(h=>{
+        h.setAttribute('cx', +h.getAttribute('cx') + dx);
+        h.setAttribute('cy', +h.getAttribute('cy') + dy);
+      });
+    }
+
+    drag.prevX = p.x; drag.prevY = p.y;
   }
+
   function endDrag(){
     drag=null;
     window.removeEventListener('pointermove', onMove);
@@ -262,20 +302,39 @@
     window.removeEventListener('touchend', endDrag);
   }
 
-  // Копирование чистого SVG зон (без ручек и картинки)
-  btnCopy.addEventListener('click', ()=>{
-    const zones = [...svg.querySelectorAll('.hotspot')].map(node=>{
-      const type = node.dataset.type, id=node.dataset.id;
-      if(node.tagName==='polygon'){
-        return `      <polygon class="hotspot" data-type="${type}" data-id="${id}" points="${node.getAttribute('points')}"/>`;
-      }else{
-        const x=node.getAttribute('x'), y=node.getAttribute('y'),
-              w=node.getAttribute('width'), h=node.getAttribute('height'),
-              rx=node.getAttribute('rx')||0;
-        return `      <rect class="hotspot" data-type="${type}" data-id="${id}" x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}"/>`;
-      }
-    }).join('\n');
+  function handlesOfRef(ref){
+    return [...handlesLayer.querySelectorAll('.handle')].filter(h=>h.dataset.ref===ref);
+  }
+  function dragHandle(ref, idx){
+    return [...handlesLayer.querySelectorAll('.handle')].find(h=>h.dataset.ref===ref && +h.dataset.idx===idx);
+  }
+  function redrawCenterHandleForPoly(ref, pts){
+    const hs = handlesOfRef(ref);
+    const cx = pts.reduce((a,p)=>a+p[0],0)/pts.length;
+    const cy = pts.reduce((a,p)=>a+p[1],0)/pts.length;
+    // последний в списке у полигона — центральный (по порядку добавления)
+    hs[hs.length-1].setAttribute('cx',cx);
+    hs[hs.length-1].setAttribute('cy',cy);
+  }
 
+  function enterEdit(){
+    document.body.classList.add('edit');
+    editMode = true;
+    drawHandles();
+  }
+  function exitEdit(){
+    document.body.classList.remove('edit');
+    editMode = false;
+    handlesLayer.innerHTML='';
+  }
+
+  document.getElementById('toggleEdit').addEventListener('click', ()=> editMode ? exitEdit() : enterEdit());
+  document.addEventListener('keydown', e=>{
+    if(e.key.toLowerCase()==='e') (editMode?exitEdit():enterEdit());
+  });
+
+  // Копирование чистого SVG зон (без картинки и ручек)
+  document.getElementById('copyBtn').addEventListener('click', ()=>{
     const anchors = [...svg.querySelectorAll('a')].map(a=>{
       const href=a.getAttribute('href'), target=a.getAttribute('target')||'_blank', rel=a.getAttribute('rel')||'noopener';
       const inner = [...a.querySelectorAll('.hotspot')].map(h=>{
@@ -287,11 +346,13 @@
     }).join('\n');
 
     const clean = `<svg viewBox="0 0 1536 1156" preserveAspectRatio="xMidYMid meet">\n${anchors}\n</svg>`;
-    output.value = clean;
-    output.parentElement.classList.add('show-output');
-    output.select(); document.execCommand('copy');
-    btnCopy.textContent = 'Скопировано!';
-    setTimeout(()=>btnCopy.textContent='Скопировать зоны',1200);
+    const out = document.getElementById('output');
+    out.value = clean;
+    out.parentElement.classList.add('show-output');
+    out.select(); document.execCommand('copy');
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Скопировано!';
+    setTimeout(()=>btn.textContent='Скопировать зоны',1200);
   });
 </script>
 </body>
