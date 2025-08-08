@@ -1,359 +1,84 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Интерактивная карта — «ШАГАЙ ДОМА»</title>
-<style>
-  :root{
-    --brand:#CF2C02;
-    --house:#0aa;       /* домики (бирюзовый) в режиме разметки */
-    --label:#CF2C02;    /* таблички (красный) в режиме разметки */
-  }
-  * { box-sizing: border-box }
-  body{margin:0;background:#fff;font-family:system-ui, Arial, sans-serif; user-select:none}
-  .wrap{max-width:1200px;margin:0 auto;position:relative}
-  svg{display:block;width:100%;height:auto;background:#fff}
-  image{pointer-events:none} /* клики идут в hotspot'ы, а не в <image> */
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Карта лагеря — кликабельные зоны</title>
+  <style>
+    :root { --brand:#CF2C02; --house:#0aa; }
+    * { box-sizing:border-box }
+    html,body { margin:0; background:#fff; font-family:system-ui, Arial, sans-serif; }
+    .map { max-width:1200px; margin:0 auto; }
+    svg { display:block; width:100%; height:auto; background:#fff; }
+    image { pointer-events:none; } /* клики проходят в зоны */
 
-  /* Кликабельные зоны в обычном режиме (невидимы, но кликабельны) */
-  .hotspot{fill:transparent;stroke:transparent;stroke-width:2;cursor:pointer; vector-effect: non-scaling-stroke;}
+    /* Зоны клика */
+    .hotspot {
+      fill: transparent;          /* невидимы, но кликабельны */
+      stroke: transparent;
+      stroke-width: 2;
+      cursor: pointer;
+      vector-effect: non-scaling-stroke;
+    }
+    /* Мягкая подсветка при наведении (ПК) или тапе (мобильники обычно без hover) */
+    a:hover .hotspot[data-type="label"] { fill: rgba(207,44,2,.14); }
+    a:hover .hotspot[data-type="house"] { fill: rgba(0,170,170,.14); }
 
-  /* В режиме разметки подсветка + отключаем переходы по ссылкам */
-  .edit .hotspot[data-type="label"]{fill:rgba(207,44,2,.14);stroke:var(--label)}
-  .edit .hotspot[data-type="house"]{fill:rgba(0,170,170,.14);stroke:var(--house)}
-  .edit a{ pointer-events: none; } /* чтобы тап/клик не вёл по ссылке во время разметки */
-
-  /* Ручки (маркеры) */
-  .handle{
-    display:none;
-    fill:#fff; stroke:#333; stroke-width:1.2;
-    cursor:grab; touch-action:none;
-  }
-  .edit .handle{ display:block; }
-  .handle:active{ cursor:grabbing; }
-
-  /* Панель */
-  .toolbar{
-    position:sticky; top:0; z-index:10;
-    display:flex; gap:.5rem; padding:.75rem 1rem;
-    backdrop-filter:saturate(1.2) blur(4px);
-    background:linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.85));
-    border-bottom:1px solid #eee;
-  }
-  .toolbar button{
-    border:none; background:var(--brand); color:#fff; font-weight:600;
-    padding:.6rem .9rem; border-radius:.6rem; cursor:pointer;
-  }
-  .toolbar .ghost{background:#eee;color:#333}
-  .tip{margin-left:auto;color:#666;font-size:.9rem}
-  textarea{
-    width:100%; min-height:160px; margin:10px 0 0; display:none;
-    font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-    border:1px solid #ddd; border-radius:.5rem; padding:.75rem;
-  }
-  .show-output textarea{display:block}
-</style>
+    /* убираем синие хайлайты на тач-устройствах */
+    a, svg, image, .hotspot {
+      -webkit-tap-highlight-color: transparent;
+      outline: none;
+    }
+  </style>
 </head>
 <body>
+  <div class="map">
+    <!-- ВАЖНО: замените href на реальное имя файла вашей карты, если оно не camp-map.jpg -->
+    <svg viewBox="0 0 1536 1156" preserveAspectRatio="xMidYMid meet" aria-label="Интерактивная карта лагеря">
+      <image href="camp-map.jpg" width="1536" height="1156" />
 
-<div class="toolbar">
-  <button id="toggleEdit">Режим разметки</button>
-  <button id="copyBtn" class="ghost">Скопировать зоны</button>
-  <div class="tip">Подсказка: нажмите <b>E</b> (ПК) • Тяните круглые маркеры (центральный — переносит зону)</div>
-</div>
+      <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696518" target="_blank" rel="noopener" aria-label="Столовая">
+        <title>Столовая</title>
+        <rect class="hotspot" data-type="label" data-id="label-stolovaya" x="183.61602783203125" y="366.9920349121094" width="332.9919738769531" height="92.01593017578125" rx="16"/>
+        <polygon class="hotspot" data-type="house" data-id="house-stolovaya" points="345.6000061035156,198.80001831054688 570.6000061035156,198.80001831054688 730.6240234375,315.64801025390625 356.864013671875,385.2799987792969 315.6000061035156,313.8000183105469"/>
+      </a>
 
-<div class="wrap">
-  <!-- Ваш нативный размер: 1536 × 1156 -->
-  <svg id="camp" viewBox="0 0 1536 1156" preserveAspectRatio="xMidYMid meet">
-    <image href="camp-map.jpg" width="1536" height="1156" />
+      <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696520" target="_blank" rel="noopener" aria-label="Спортивный зал">
+        <title>Спортивный зал</title>
+        <rect class="hotspot" data-type="label" data-id="label-sport" x="621.2960205078125" y="528.8800659179688" width="375" height="88" rx="16"/>
+        <polygon class="hotspot" data-type="house" data-id="house-sport" points="584.1919555664062,388.35198974609375 782.8479614257812,361.7279968261719 829.9519653320312,530.6880493164062 580.0960083007812,577.7919921875 502.27197265625,492.79998779296875"/>
+      </a>
 
-    <!-- ===== ЗОНЫ (ТАБЛИЧКИ + ДОМИКИ) =====
-         data-type="label" для табличек (красные в edit),
-         data-type="house" для домиков (бирюзовые в edit).
-         Координаты примерные — подгоните маркерами.
-    -->
+      <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696522" target="_blank" rel="noopener" aria-label="Дискотека">
+        <title>Дискотека</title>
+        <rect class="hotspot" data-type="label" data-id="label-disco" x="956.927978515625" y="357.1359558105469" width="402.4161376953125" height="92.65603637695312" rx="16"/>
+        <polygon class="hotspot" data-type="house" data-id="house-disco" points="987.64794921875,189.6959991455078 1236.47998046875,234.75201416015625 1117.6959228515625,497.91998291015625 887.2960205078125,412.9280090332031"/>
+      </a>
 
-    <!-- СТОЛОВАЯ -->
-    <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696518" target="_blank" rel="noopener">
-      <!-- табличка -->
-      <rect class="hotspot" data-type="label" data-id="label-stolovaya"
-            x="200" y="538" width="330" height="90" rx="16"/>
-      <!-- домик -->
-      <polygon class="hotspot" data-type="house" data-id="house-stolovaya"
-               points="320,250 545,250 575,400 335,440 290,365"/>
-    </a>
+      <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696523" target="_blank" rel="noopener" aria-label="Палаты">
+        <title>Палаты</title>
+        <rect class="hotspot" data-type="label" data-id="label-palaty" x="110.70404052734375" y="649.8399658203125" width="330" height="88" rx="16"/>
+        <polygon class="hotspot" data-type="house" data-id="house-palaty" points="166.33599853515625,489.31195068359375 406.33599853515625,489.31195068359375 592.3839721679688,638.2080078125 127.48798370361328,641.2799682617188"/>
+      </a>
 
-    <!-- СПОРТИВНЫЙ ЗАЛ -->
-    <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696520" target="_blank" rel="noopener">
-      <rect class="hotspot" data-type="label" data-id="label-sport"
-            x="694" y="662" width="375" height="88" rx="16"/>
-      <polygon class="hotspot" data-type="house" data-id="house-sport"
-               points="650,485 905,485 920,660 680,660 665,565"/>
-    </a>
+      <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696533" target="_blank" rel="noopener" aria-label="Беседка">
+        <title>Беседка</title>
+        <rect class="hotspot" data-type="label" data-id="label-besedka" x="116.46401977539062" y="1011.1680908203125" width="300" height="88" rx="16"/>
+        <polygon class="hotspot" data-type="house" data-id="house-besedka" points="182,884 267.7760009765625,831.7440185546875 409.0879821777344,964.864013671875 185.85598754882812,1006.8480224609375"/>
+      </a>
 
-    <!-- ДИСКОТЕКА -->
-    <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696522" target="_blank" rel="noopener">
-      <rect class="hotspot" data-type="label" data-id="label-disco"
-            x="1084" y="522" width="346" height="88" rx="16"/>
-      <polygon class="hotspot" data-type="house" data-id="house-disco"
-               points="1026,400 1238,382 1252,552 1056,572"/>
-    </a>
+      <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696534" target="_blank" rel="noopener" aria-label="Кинозал">
+        <title>Кинозал</title>
+        <rect class="hotspot" data-type="label" data-id="label-cinema" x="1053.887939453125" y="622.8639526367188" width="331" height="88" rx="16"/>
+        <polygon class="hotspot" data-type="house" data-id="house-cinema" points="1145.3441162109375,482.55999755859375 1329.6640625,461.0559997558594 1338.8800048828125,628.9920043945312 1137.50390625,617.2160034179688"/>
+      </a>
 
-    <!-- ПАЛАТЫ -->
-    <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696523" target="_blank" rel="noopener">
-      <rect class="hotspot" data-type="label" data-id="label-palaty"
-            x="166" y="742" width="330" height="88" rx="16"/>
-      <polygon class="hotspot" data-type="house" data-id="house-palaty"
-               points="152,604 392,604 438,722 122,722"/>
-    </a>
-
-    <!-- БЕСЕДКА -->
-    <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696533" target="_blank" rel="noopener">
-      <rect class="hotspot" data-type="label" data-id="label-besedka"
-            x="182" y="1004" width="300" height="88" rx="16"/>
-      <polygon class="hotspot" data-type="house" data-id="house-besedka"
-               points="182,884 302,844 362,924 242,964"/>
-    </a>
-
-    <!-- КИНОЗАЛ -->
-    <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696534" target="_blank" rel="noopener">
-      <rect class="hotspot" data-type="label" data-id="label-cinema"
-            x="1144" y="842" width="331" height="88" rx="16"/>
-      <polygon class="hotspot" data-type="house" data-id="house-cinema"
-               points="1086,724 1250,724 1296,864 1116,864"/>
-    </a>
-
-    <!-- КОМНАТЫ ОТДЫХА -->
-    <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696535" target="_blank" rel="noopener">
-      <rect class="hotspot" data-type="label" data-id="label-rooms"
-            x="1054" y="1044" width="392" height="88" rx="16"/>
-      <polygon class="hotspot" data-type="house" data-id="house-rooms"
-               points="966,964 1190,964 1236,1084 934,1084"/>
-    </a>
-
-    <!-- сюда динамически добавятся ручки -->
-    <g id="handles"></g>
-  </svg>
-
-  <textarea id="output" readonly></textarea>
-</div>
-
-<script>
-  const svg = document.getElementById('camp');
-  const handlesLayer = document.getElementById('handles');
-  const btnEdit = document.getElementById('toggleEdit');
-  const btnCopy = document.getElementById('copyBtn');
-  const output = document.getElementById('output');
-
-  const HANDLE_R = window.matchMedia('(pointer:coarse)').matches ? 14 : 8;
-
-  let editMode = false;
-  let drag = null; // {ref, kind, idx, prevX, prevY}
-
-  function svgPoint(evt){
-    const pt = svg.createSVGPoint();
-    pt.x = (evt.touches ? evt.touches[0].clientX : evt.clientX);
-    pt.y = (evt.touches ? evt.touches[0].clientY : evt.clientY);
-    return pt.matrixTransform(svg.getScreenCTM().inverse());
-  }
-  function getRef(shape){
-    return shape.dataset.id || (shape.dataset.id = 'sh'+Math.random().toString(36).slice(2));
-  }
-  function findShape(ref){
-    return svg.querySelector('.hotspot[data-id="'+ref+'"]');
-  }
-
-  function circle(cx,cy, shape, idx, kind, strokeColor){
-    const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
-    c.setAttribute('class','handle');
-    c.setAttribute('r', HANDLE_R);
-    c.setAttribute('cx',cx);
-    c.setAttribute('cy',cy);
-    c.dataset.idx = idx;           // -1 = центр (перемещение)
-    c.dataset.ref = getRef(shape);
-    c.dataset.kind = kind;         // 'poly'|'rect'|'move-poly'|'move-rect'
-    c.style.stroke = strokeColor || '#333';
-    c.style.fill = '#fff';
-    c.addEventListener('pointerdown', startDrag);
-    c.addEventListener('touchstart', startDrag, {passive:false});
-    return c;
-  }
-
-  function drawHandles(){
-    handlesLayer.innerHTML='';
-    const shapes = svg.querySelectorAll('.hotspot');
-    shapes.forEach(sh=>{
-      const stroke = sh.dataset.type==='label' ? 'var(--label)' : 'var(--house)';
-      if(sh.tagName==='polygon'){
-        // точки полигона
-        const pts = sh.getAttribute('points').trim().split(/\s+/).map(p=>p.split(',').map(Number));
-        pts.forEach((p,i)=>{
-          handlesLayer.appendChild(circle(p[0], p[1], sh, i, 'poly', stroke));
-        });
-        // центральная ручка для перемещения всего полигона
-        const cx = pts.reduce((a,p)=>a+p[0],0)/pts.length;
-        const cy = pts.reduce((a,p)=>a+p[1],0)/pts.length;
-        handlesLayer.appendChild(circle(cx, cy, sh, -1, 'move-poly', stroke));
-      } else if(sh.tagName==='rect'){
-        // углы
-        const x=+sh.getAttribute('x'), y=+sh.getAttribute('y'),
-              w=+sh.getAttribute('width'), h=+sh.getAttribute('height');
-        const corners = [[x,y],[x+w,y],[x+w,y+h],[x,y+h]];
-        corners.forEach((p,i)=>{
-          handlesLayer.appendChild(circle(p[0], p[1], sh, i, 'rect', 'var(--label)'));
-        });
-        // центральная ручка для перемещения всего прямоугольника
-        const cxMid = x + w/2, cyMid = y + h/2;
-        handlesLayer.appendChild(circle(cxMid, cyMid, sh, -1, 'move-rect', 'var(--label)'));
-      }
-    });
-  }
-
-  function startDrag(e){
-    e.preventDefault();
-    const p = svgPoint(e);
-    drag = {
-      ref: this.dataset.ref,
-      kind: this.dataset.kind,
-      idx: +this.dataset.idx,
-      prevX: p.x,
-      prevY: p.y
-    };
-    window.addEventListener('pointermove', onMove);
-    window.addEventListener('pointerup', endDrag);
-    window.addEventListener('touchmove', onMove, {passive:false});
-    window.addEventListener('touchend', endDrag);
-  }
-
-  function onMove(e){
-    if(!drag) return;
-    e.preventDefault();
-    const p = svgPoint(e);
-    const dx = p.x - drag.prevX;
-    const dy = p.y - drag.prevY;
-    const shape = findShape(drag.ref);
-
-    if(drag.kind==='poly' && drag.idx>=0){
-      // перемещение вершины полигона
-      const pts = shape.getAttribute('points').trim().split(/\s+/).map(s=>s.split(',').map(Number));
-      pts[drag.idx] = [p.x, p.y];
-      shape.setAttribute('points', pts.map(a=>a.join(',')).join(' '));
-      // сдвигаем конкретную ручку
-      const handle = dragHandle(drag.ref, drag.idx);
-      if(handle){ handle.setAttribute('cx', p.x); handle.setAttribute('cy', p.y); }
-      // центральную тоже перерисуем
-      redrawCenterHandleForPoly(drag.ref, pts);
-    }
-    else if(drag.kind==='move-poly'){
-      // перенос полигона целиком
-      const pts = shape.getAttribute('points').trim().split(/\s+/).map(s=>s.split(',').map(Number));
-      const moved = pts.map(([x,y])=>[x+dx,y+dy]);
-      shape.setAttribute('points', moved.map(a=>a.join(',')).join(' '));
-      // сдвигаем все ручки этого полигона
-      handlesOfRef(drag.ref).forEach(h=>{
-        h.setAttribute('cx', +h.getAttribute('cx') + dx);
-        h.setAttribute('cy', +h.getAttribute('cy') + dy);
-      });
-    }
-    else if(drag.kind==='rect' && drag.idx>=0){
-      // изменение размера прямоугольника по углам
-      const rect = shape;
-      let x = +rect.getAttribute('x'),
-          y = +rect.getAttribute('y'),
-          w = +rect.getAttribute('width'),
-          h = +rect.getAttribute('height');
-      let corners = [[x,y],[x+w,y],[x+w,y+h],[x,y+h]];
-      corners[drag.idx] = [p.x, p.y];
-      const xs = corners.map(c=>c[0]), ys = corners.map(c=>c[1]);
-      const nx = Math.min(...xs), ny = Math.min(...ys),
-            nw = Math.max(...xs) - nx, nh = Math.max(...ys) - ny;
-      rect.setAttribute('x', nx); rect.setAttribute('y', ny);
-      rect.setAttribute('width', nw); rect.setAttribute('height', nh);
-      // обновляем все 5 ручек (4 угла + центр)
-      const hs = handlesOfRef(drag.ref);
-      const newCorners = [[nx,ny],[nx+nw,ny],[nx+nw,ny+nh],[nx,ny+nh]];
-      // первые 4 — углы
-      hs.slice(0,4).forEach((h,i)=>{ h.setAttribute('cx',newCorners[i][0]); h.setAttribute('cy',newCorners[i][1]); });
-      // последняя — центр
-      const cxMid = nx + nw/2, cyMid = ny + nh/2;
-      hs[4].setAttribute('cx',cxMid); hs[4].setAttribute('cy',cyMid);
-    }
-    else if(drag.kind==='move-rect'){
-      // перенос прямоугольника целиком
-      const rect = shape;
-      const x = +rect.getAttribute('x'), y = +rect.getAttribute('y');
-      rect.setAttribute('x', x+dx); rect.setAttribute('y', y+dy);
-      // сдвигаем все ручки этого прямоугольника
-      handlesOfRef(drag.ref).forEach(h=>{
-        h.setAttribute('cx', +h.getAttribute('cx') + dx);
-        h.setAttribute('cy', +h.getAttribute('cy') + dy);
-      });
-    }
-
-    drag.prevX = p.x; drag.prevY = p.y;
-  }
-
-  function endDrag(){
-    drag=null;
-    window.removeEventListener('pointermove', onMove);
-    window.removeEventListener('pointerup', endDrag);
-    window.removeEventListener('touchmove', onMove);
-    window.removeEventListener('touchend', endDrag);
-  }
-
-  function handlesOfRef(ref){
-    return [...handlesLayer.querySelectorAll('.handle')].filter(h=>h.dataset.ref===ref);
-  }
-  function dragHandle(ref, idx){
-    return [...handlesLayer.querySelectorAll('.handle')].find(h=>h.dataset.ref===ref && +h.dataset.idx===idx);
-  }
-  function redrawCenterHandleForPoly(ref, pts){
-    const hs = handlesOfRef(ref);
-    const cx = pts.reduce((a,p)=>a+p[0],0)/pts.length;
-    const cy = pts.reduce((a,p)=>a+p[1],0)/pts.length;
-    // последний в списке у полигона — центральный (по порядку добавления)
-    hs[hs.length-1].setAttribute('cx',cx);
-    hs[hs.length-1].setAttribute('cy',cy);
-  }
-
-  function enterEdit(){
-    document.body.classList.add('edit');
-    editMode = true;
-    drawHandles();
-  }
-  function exitEdit(){
-    document.body.classList.remove('edit');
-    editMode = false;
-    handlesLayer.innerHTML='';
-  }
-
-  document.getElementById('toggleEdit').addEventListener('click', ()=> editMode ? exitEdit() : enterEdit());
-  document.addEventListener('keydown', e=>{
-    if(e.key.toLowerCase()==='e') (editMode?exitEdit():enterEdit());
-  });
-
-  // Копирование чистого SVG зон (без картинки и ручек)
-  document.getElementById('copyBtn').addEventListener('click', ()=>{
-    const anchors = [...svg.querySelectorAll('a')].map(a=>{
-      const href=a.getAttribute('href'), target=a.getAttribute('target')||'_blank', rel=a.getAttribute('rel')||'noopener';
-      const inner = [...a.querySelectorAll('.hotspot')].map(h=>{
-        return (h.tagName==='polygon')
-          ? `<polygon class="hotspot" data-type="${h.dataset.type}" data-id="${h.dataset.id}" points="${h.getAttribute('points')}"/>`
-          : `<rect class="hotspot" data-type="${h.dataset.type}" data-id="${h.dataset.id}" x="${h.getAttribute('x')}" y="${h.getAttribute('y')}" width="${h.getAttribute('width')}" height="${h.getAttribute('height')}" rx="${h.getAttribute('rx')||0}"/>`;
-      }).join('\n        ');
-      return `    <a href="${href}" target="${target}" rel="${rel}">\n        ${inner}\n    </a>`;
-    }).join('\n');
-
-    const clean = `<svg viewBox="0 0 1536 1156" preserveAspectRatio="xMidYMid meet">\n${anchors}\n</svg>`;
-    const out = document.getElementById('output');
-    out.value = clean;
-    out.parentElement.classList.add('show-output');
-    out.select(); document.execCommand('copy');
-    const btn = document.getElementById('copyBtn');
-    btn.textContent = 'Скопировано!';
-    setTimeout(()=>btn.textContent='Скопировать зоны',1200);
-  });
-</script>
+      <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696535" target="_blank" rel="noopener" aria-label="Комната отдыха">
+        <title>Комната отдыха</title>
+        <rect class="hotspot" data-type="label" data-id="label-rooms" x="886.0640869140625" y="897.280029296875" width="472.2718505859375" height="162.0159912109375" rx="16"/>
+        <polygon class="hotspot" data-type="house" data-id="house-rooms" points="969.072021484375,783.7760009765625 1253.887939453125,805.1199951171875 1263.10400390625,954.6240234375 947.7119750976562,960.7680053710938"/>
+      </a>
+    </svg>
+  </div>
 </body>
-        </html>
+</html>
