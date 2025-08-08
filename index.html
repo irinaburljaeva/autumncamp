@@ -17,18 +17,6 @@
       fill:transparent; stroke:transparent; stroke-width:2;
       cursor:pointer; vector-effect:non-scaling-stroke;
       transform-box: fill-box; transform-origin: center;
-      transition: stroke .18s ease, opacity .18s ease;
-    }
-    /* Еле заметная подсветка при ховере на ПК */
-    a:hover .hotspot[data-type="label"]{ stroke:rgba(207,44,2,.35); }
-    a:hover .hotspot[data-type="house"]{ stroke:rgba(0,170,170,.35); }
-
-    /* Аккуратный пульс и контур при клике */
-    .outline-label{ stroke:rgba(207,44,2,.7) !important; }
-    .outline-house{ stroke:rgba(0,170,170,.7) !important; }
-    .pulse{ animation:pulse .42s ease-out; }
-    @keyframes pulse{
-      0%{ transform:scale(1) } 50%{ transform:scale(1.04) } 100%{ transform:scale(1) }
     }
 
     /* Маленький ripple */
@@ -50,25 +38,12 @@
       to  { transform: translate(var(--dx),var(--dy)) scale(.4); opacity:0 }
     }
 
-    /* Тост-подсказка у пальца/мыши */
-    #toast{
-      position: fixed; z-index: 20; pointer-events: none;
-      background:#fff; color:#111; border:1px solid rgba(0,0,0,.1);
-      box-shadow: 0 6px 20px rgba(0,0,0,.12);
-      padding:.45rem .7rem; border-radius:10px; font-size:14px; opacity:0;
-      transform: translate(-50%,-140%); transition: opacity .18s ease, transform .18s ease;
-      white-space: nowrap;
-    }
-    #toast.show{ opacity:1; transform: translate(-50%,-160%) }
-
-    /* Убираем синий хайлайт */
+    /* Убираем синий хайлайт на мобилках */
     a, svg, image, .hotspot{ -webkit-tap-highlight-color: transparent; outline: none; }
   </style>
 </head>
 <body>
   <div class="map">
-    <div id="toast"></div>
-
     <svg id="camp" viewBox="0 0 1536 1156" preserveAspectRatio="xMidYMid meet" aria-label="Интерактивная карта лагеря">
       <image href="camp-map.jpg" width="1536" height="1156" />
 
@@ -99,7 +74,7 @@
       <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696533" target="_blank" rel="noopener" aria-label="Беседка">
         <title>Беседка</title>
         <rect class="hotspot" data-type="label" x="116.46401977539062" y="1011.1680908203125" width="300" height="88" rx="16"/>
-        <polygon class="hotspot" data-type="house" points="182,884 267.7760009765625,831.7440185546875 409.0879821777344,964.864013671875 185.85598754882812,1006.84802265625"/>
+        <polygon class="hotspot" data-type="house" points="182,884 267.7760009765625,831.7440185546875 409.0879821777344,964.864013671875 185.85598754882812,1006.8480224609375"/>
       </a>
 
       <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696534" target="_blank" rel="noopener" aria-label="Кинозал">
@@ -120,10 +95,9 @@
   </div>
 
   <script>
-    const svg = document.getElementById('camp');
-    const fx  = document.getElementById('fx');
-    const toast = document.getElementById('toast');
-    const sparkColors = ['var(--brand)','var(--brand2)','var(--brand3)'];
+    const svg  = document.getElementById('camp');
+    const fx   = document.getElementById('fx');
+    const colors = ['var(--brand)','var(--brand2)','var(--brand3)'];
 
     function svgPoint(evt){
       const pt = svg.createSVGPoint();
@@ -132,22 +106,12 @@
       return pt.matrixTransform(svg.getScreenCTM().inverse());
     }
 
-    function showToast(text, clientX, clientY){
-      toast.textContent = text + ' →';
-      const vw = Math.max(document.documentElement.clientWidth, window.innerWidth||0);
-      const vh = Math.max(document.documentElement.clientHeight, window.innerHeight||0);
-      toast.style.left = Math.min(Math.max(16, clientX), vw-16) + 'px';
-      toast.style.top  = Math.min(Math.max(16, clientY), vh-16) + 'px';
-      toast.classList.add('show');
-      setTimeout(()=>toast.classList.remove('show'), 520);
-    }
-
     function ripple(x,y){
       const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
       c.setAttribute('class','ripple');
       c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', 0);
       fx.appendChild(c);
-      setTimeout(()=>c.remove(), 500);
+      setTimeout(()=>c.remove(), 520);
     }
 
     function sparks(x,y,count=12){
@@ -159,9 +123,9 @@
         s.setAttribute('r', 3 + Math.random()*2);
         s.style.setProperty('--dx', dx+'px');
         s.style.setProperty('--dy', dy+'px');
-        s.style.color = sparkColors[Math.floor(Math.random()*sparkColors.length)];
+        s.style.color = colors[Math.floor(Math.random()*colors.length)];
         fx.appendChild(s);
-        setTimeout(()=>s.remove(), 650);
+        setTimeout(()=>s.remove(), 700);
       }
     }
 
@@ -173,26 +137,10 @@
       // вибрация
       if(navigator.vibrate) navigator.vibrate(15);
 
-      // название из <title>
-      const name = anchor.querySelector('title')?.textContent || 'Локация';
-
-      // геометрии зоны
-      const zones = anchor.querySelectorAll('.hotspot');
-      zones.forEach(z=>{
-        const outline = z.dataset.type==='label' ? 'outline-label' : 'outline-house';
-        z.classList.add('pulse', outline);
-        setTimeout(()=>z.classList.remove('pulse', outline), 380);
-      });
-
       // эффекты в точке клика
       const p = svgPoint(e);
       ripple(p.x, p.y);
       sparks(p.x, p.y, 14);
-
-      // тост у пальца/мыши
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      showToast(name, clientX, clientY);
 
       // переход спустя короткую паузу
       const href = anchor.getAttribute('href');
@@ -200,7 +148,7 @@
       setTimeout(()=>{
         if(target==='_blank'){ window.open(href,'_blank','noopener'); }
         else{ location.href = href; }
-      }, 360);
+      }, 320);
     }, {passive:false});
   </script>
 </body>
