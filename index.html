@@ -12,19 +12,39 @@
     svg { display:block; width:100%; height:auto; background:#fff; }
     image { pointer-events:none; } /* клики проходят в зоны */
 
-    /* Зоны клика */
+    /* Зоны — невидимы, но кликабельны */
     .hotspot {
-      fill: transparent;          /* невидимы, но кликабельны */
+      fill: transparent;
       stroke: transparent;
       stroke-width: 2;
       cursor: pointer;
       vector-effect: non-scaling-stroke;
+      transition: fill .18s ease, stroke .18s ease;
     }
-    /* Мягкая подсветка при наведении (ПК) или тапе (мобильники обычно без hover) */
+    /* Лёгкая подсветка при наведении (ПК) */
     a:hover .hotspot[data-type="label"] { fill: rgba(207,44,2,.14); }
     a:hover .hotspot[data-type="house"] { fill: rgba(0,170,170,.14); }
 
-    /* убираем синие хайлайты на тач-устройствах */
+    /* Активная подсветка на клик */
+    .glow-label { fill: rgba(207,44,2,.18) !important; stroke: rgba(207,44,2,.6) !important; }
+    .glow-house { fill: rgba(0,170,170,.18) !important; stroke: rgba(0,170,170,.6) !important; }
+
+    /* SVG ripple (всплеск) */
+    .ripple {
+      fill: none;
+      stroke: var(--brand);
+      stroke-width: 3;
+      opacity: .6;
+      transform-origin: center;
+      animation: ripple .45s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes ripple {
+      from { r: 0; opacity: .6; }
+      to   { r: 140; opacity: 0; }
+    }
+
+    /* Убираем синие хайлайты на таче */
     a, svg, image, .hotspot {
       -webkit-tap-highlight-color: transparent;
       outline: none;
@@ -33,8 +53,8 @@
 </head>
 <body>
   <div class="map">
-    <!-- ВАЖНО: замените href на реальное имя файла вашей карты, если оно не camp-map.jpg -->
-    <svg viewBox="0 0 1536 1156" preserveAspectRatio="xMidYMid meet" aria-label="Интерактивная карта лагеря">
+    <!-- Замените href на имя файла вашей карты, если не camp-map.jpg -->
+    <svg id="camp" viewBox="0 0 1536 1156" preserveAspectRatio="xMidYMid meet" aria-label="Интерактивная карта лагеря">
       <image href="camp-map.jpg" width="1536" height="1156" />
 
       <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696518" target="_blank" rel="noopener" aria-label="Столовая">
@@ -78,7 +98,118 @@
         <rect class="hotspot" data-type="label" data-id="label-rooms" x="886.0640869140625" y="897.280029296875" width="472.2718505859375" height="162.0159912109375" rx="16"/>
         <polygon class="hotspot" data-type="house" data-id="house-rooms" points="969.072021484375,783.7760009765625 1253.887939453125,805.1199951171875 1263.10400390625,954.6240234375 947.7119750976562,960.7680053710938"/>
       </a>
+
+      <!-- слой для ряпла -->
+      <g id="fx"></g>
     </svg>
   </div>
+
+  <script>
+    const svg = document.getElementById('camp');
+    const fx = document.getElementById('fx');
+
+    // Исходный viewBox
+    const base = { x:0, y:0, w:1536, h:1156 };
+
+    // Еasing
+    const ease = t => t<.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2;
+
+    // Координаты клика в системе SVG
+    function svgPoint(evt){
+      const pt = svg.createSVGPoint();
+      const e = evt.touches ? evt.touches[0] : evt;
+      pt.x = e.clientX; pt.y = e.clientY;
+      return pt.matrixTransform(svg.getScreenCTM().inverse());
+    }
+
+    // Обработчик клика по ссылке
+    svg.addEventListener('click', (e)=>{
+      const a = e.target.closest('a');
+      if(!a) return;
+
+      e.preventDefault(); // свои эффекты + затем навигация
+      // Вибро (мобилки)
+      if (navigator.vibrate) navigator.vibrate(15);
+
+      // Подсветка зоны (внутри выбранного <a>)
+      const zones = a.querySelectorAll('.hotspot');
+      zones.forEach(z=>{
+        const cls = z.dataset.type === 'label' ? 'glow-label' : 'glow-house';
+        z.classList.add(cls);
+        setTimeout(()=>z.classList.remove(cls), 300);
+      });
+
+      // Ripple в точке клика
+      const p = svgPoint(e);
+      const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      c.setAttribute('class','ripple');
+      c.setAttribute('cx', p.x);
+      c.setAttribute('cy', p.y);
+      c.setAttribute('r', 0);
+      fx.appendChild(c);
+      setTimeout(()=>c.remove(), 500);
+
+      // Мягкий зум к зоне
+      const bbox = unionBBox(zones);
+      animateViewBoxTo(bbox, 360, () => {
+        // навигация после анимации (короткая задержка = не блокируется)
+        const href = a.getAttribute('href');
+        const target = a.getAttribute('target') || '_self';
+        if (target === '_blank') {
+          window.open(href, '_blank', 'noopener');
+        } else {
+          location.href = href;
+        }
+      });
+    }, false);
+
+    // Считаем объединённый bbox для набора зон
+    function unionBBox(nodeList){
+      let minX=Infinity, minY=Infinity, maxX=-Infinity, maxY=-Infinity;
+      nodeList.forEach(n=>{
+        const b = n.getBBox();
+        minX = Math.min(minX, b.x);
+        minY = Math.min(minY, b.y);
+        maxX = Math.max(maxX, b.x + b.width);
+        maxY = Math.max(maxY, b.y + b.height);
+      });
+      // Немного паддинга
+      const pad = Math.max((maxX-minX), (maxY-minY)) * 0.20;
+      minX -= pad; minY -= pad; maxX += pad; maxY += pad;
+
+      // Ограничим в пределах исходного viewBox
+      minX = Math.max(base.x, minX);
+      minY = Math.max(base.y, minY);
+      maxX = Math.min(base.x + base.w, maxX);
+      maxY = Math.min(base.y + base.h, maxY);
+
+      return { x:minX, y:minY, w:maxX-minX, h:maxY-minY };
+    }
+
+    // Анимация viewBox
+    function animateViewBoxTo(target, dur=360, done){
+      const vb0 = svg.viewBox.baseVal;
+      const start = { x: vb0.x, y: vb0.y, w: vb0.width, h: vb0.height };
+      const t0 = performance.now();
+
+      function frame(t){
+        const k = Math.min(1, (t - t0) / dur);
+        const e = ease(k);
+        const x = lerp(start.x, target.x, e);
+        const y = lerp(start.y, target.y, e);
+        const w = lerp(start.w, target.w, e);
+        const h = lerp(start.h, target.h, e);
+        svg.setAttribute('viewBox', `${x} ${y} ${w} ${h}`);
+        if(k < 1) {
+          requestAnimationFrame(frame);
+        } else {
+          // небольшой таймаут, чтобы всплеск успел «сойти»
+          setTimeout(done, 40);
+        }
+      }
+      requestAnimationFrame(frame);
+    }
+    function lerp(a,b,t){ return a + (b-a)*t; }
+  </script>
 </body>
-</html>
+  </html>
