@@ -19,7 +19,7 @@
       transform-box: fill-box; transform-origin: center;
     }
 
-    /* Маленький ripple */
+    /* Ripple */
     .ripple{
       fill:none; stroke:var(--brand); stroke-width:3; opacity:.6;
       animation:ripple .45s ease-out forwards; pointer-events:none;
@@ -47,7 +47,7 @@
     <svg id="camp" viewBox="0 0 1536 1156" preserveAspectRatio="xMidYMid meet" aria-label="Интерактивная карта лагеря">
       <image href="camp-map.jpg" width="1536" height="1156" />
 
-      <!-- СТОЛОВАЯ (звук: kitchen) -->
+      <!-- СТОЛОВАЯ (звук: kitchen.mp3, 3 сек) -->
       <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696518"
          target="_blank" rel="noopener" aria-label="Столовая" data-sound="kitchen">
         <title>Столовая</title>
@@ -55,7 +55,7 @@
         <polygon class="hotspot" data-type="house" points="345.6000061035156,198.80001831054688 570.6000061035156,198.80001831054688 730.6240234375,315.64801025390625 356.864013671875,385.2799987792969 315.6000061035156,313.8000183105469"/>
       </a>
 
-      <!-- СПОРТЗАЛ (звук: sport) -->
+      <!-- СПОРТЗАЛ (звук: sport.mp3, 3 сек) -->
       <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696520"
          target="_blank" rel="noopener" aria-label="Спортивный зал" data-sound="sport">
         <title>Спортивный зал</title>
@@ -63,39 +63,39 @@
         <polygon class="hotspot" data-type="house" points="584.1919555664062,388.35198974609375 782.8479614257812,361.7279968261719 829.9519653320312,530.6880493164062 580.0960083007812,577.7919921875 502.27197265625,492.79998779296875"/>
       </a>
 
-      <!-- ДИСКОТЕКА (пока без звука) -->
+      <!-- ДИСКОТЕКА (звук: tell.mp3, 3 сек) -->
       <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696522"
-         target="_blank" rel="noopener" aria-label="Дискотека">
+         target="_blank" rel="noopener" aria-label="Дискотека" data-sound="disco">
         <title>Дискотека</title>
         <rect class="hotspot" data-type="label" x="956.927978515625" y="357.1359558105469" width="402.4161376953125" height="92.65603637695312" rx="16"/>
         <polygon class="hotspot" data-type="house" points="987.64794921875,189.6959991455078 1236.47998046875,234.75201416015625 1117.6959228515625,497.91998291015625 887.2960205078125,412.9280090332031"/>
       </a>
 
-      <!-- ПАЛАТЫ (пока без звука) -->
+      <!-- ПАЛАТЫ (звук: rooms.mp3, 3 сек) -->
       <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696523"
-         target="_blank" rel="noopener" aria-label="Палаты">
+         target="_blank" rel="noopener" aria-label="Палаты" data-sound="rooms">
         <title>Палаты</title>
         <rect class="hotspot" data-type="label" x="110.70404052734375" y="649.8399658203125" width="330" height="88" rx="16"/>
         <polygon class="hotspot" data-type="house" points="166.33599853515625,489.31195068359375 406.33599853515625,489.31195068359375 592.3839721679688,638.2080078125 127.48798370361328,641.2799682617188"/>
       </a>
 
-      <!-- БЕСЕДКА (пока без звука) -->
+      <!-- БЕСЕДКА (звук: birds.mp3, 3 сек) -->
       <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696533"
-         target="_blank" rel="noopener" aria-label="Беседка">
+         target="_blank" rel="noopener" aria-label="Беседка" data-sound="birds">
         <title>Беседка</title>
         <rect class="hotspot" data-type="label" x="116.46401977539062" y="1011.1680908203125" width="300" height="88" rx="16"/>
         <polygon class="hotspot" data-type="house" points="182,884 267.7760009765625,831.7440185546875 409.0879821777344,964.864013671875 185.85598754882812,1006.8480224609375"/>
       </a>
 
-      <!-- КИНОЗАЛ (пока без звука) -->
+      <!-- КИНОЗАЛ (звук: cinema.mp3, 3 сек) -->
       <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696534"
-         target="_blank" rel="noopener" aria-label="Кинозал">
+         target="_blank" rel="noopener" aria-label="Кинозал" data-sound="cinema">
         <title>Кинозал</title>
         <rect class="hotspot" data-type="label" x="1053.887939453125" y="622.8639526367188" width="331" height="88" rx="16"/>
         <polygon class="hotspot" data-type="house" points="1145.3441162109375,482.55999755859375 1329.6640625,461.0559997558594 1338.8800048828125,628.9920043945312 1137.50390625,617.2160034179688"/>
       </a>
 
-      <!-- КОМНАТА ОТДЫХА (пока без звука) -->
+      <!-- КОМНАТА ОТДЫХА (без звука, можно добавить позже data-sound="...") -->
       <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696535"
          target="_blank" rel="noopener" aria-label="Комната отдыха">
         <title>Комната отдыха</title>
@@ -103,16 +103,12 @@
         <polygon class="hotspot" data-type="house" points="969.072021484375,783.7760009765625 1253.887939453125,805.1199951171875 1263.10400390625,954.6240234375 947.7119750976562,960.7680053710938"/>
       </a>
 
-      <!-- НОВАЯ ЛОКАЦИЯ: КОСТЁР (звук: fire) -->
-      <!-- TODO: подгоните x/y/points под ваше изображение -->
-      <a href="#"
-         aria-label="Костёр" data-sound="fire">
+      <!-- КОСТЁР (звук: fire.mp3, 3 сек) — поднят вверх на ~25px -->
+      <a href="#" aria-label="Костёр" data-sound="fire">
         <title>Костёр</title>
-        <!-- Примерная зона подписи -->
-        <rect class="hotspot" data-type="label" x="705" y="745" width="260" height="80" rx="16"/>
-        <!-- Примерный многоугольник костра (огонь/кострище) -->
+        <rect class="hotspot" data-type="label" x="705" y="720" width="260" height="80" rx="16"/>
         <polygon class="hotspot" data-type="fire"
-                 points="760,700 790,650 820,700 845,690 835,720 855,740 820,745 805,770 785,745 750,735"/>
+                 points="760,675 790,625 820,675 845,665 835,695 855,715 820,720 805,745 785,720 750,710"/>
       </a>
 
       <!-- слой для эффектов -->
@@ -125,41 +121,59 @@
     const fx   = document.getElementById('fx');
     const colors = ['var(--brand)','var(--brand2)','var(--brand3)'];
 
-    /* ==== АУДИО ==== */
+    /* ====== АУДИО ====== */
     const soundFiles = {
       kitchen: 'kitchen.mp3',
       sport:   'sport.mp3',
+      disco:   'tell.mp3',
+      rooms:   'rooms.mp3',
+      birds:   'birds.mp3',
+      cinema:  'cinema.mp3',
       fire:    'fire.mp3'
-      // при желании добавьте: disco:'disco.mp3', cinema:'cinema.mp3', etc.
     };
 
-    // создаём/кэшируем Audio объекты
+    // создаём аудио-объекты
     const sounds = {};
     for (const key in soundFiles){
       const a = new Audio(soundFiles[key]);
       a.preload = 'auto';
-      a.volume = 0.9; // при необходимости подстройте
+      a.volume = 0.9;
       sounds[key] = a;
     }
 
-    // iOS иногда требует "разблокировки" аудио первым жестом
+    // iOS/webkit: разблокировать аудио на первый жест
     const unlock = () => {
-      Object.values(sounds).forEach(a => { try { a.play().then(()=>a.pause()).catch(()=>{}); } catch(_){} });
-      document.removeEventListener('pointerdown', unlock, { once:true });
+      Object.values(sounds).forEach(a => {
+        try { a.play().then(()=>a.pause()).catch(()=>{}); } catch(_){}
+      });
     };
     document.addEventListener('pointerdown', unlock, { once:true });
+
+    // ограничение звучания до 3 секунд для всех звуков
+    const MAX_PLAY_MS = 3000;
+    const pauseTimers = {};
 
     function playSound(key){
       const a = sounds[key];
       if(!a) return;
+
       try {
-        // быстрый перезапуск звука при частых кликах
+        // сбрасываем предыдущий автопаузер
+        if (pauseTimers[key]) clearTimeout(pauseTimers[key]);
+
+        // быстрый перезапуск при повторных кликах
         a.currentTime = 0;
-        a.play().catch(()=>{ /* игнорируем блокировки браузера */ });
+        a.play().catch(()=>{});
+
+        // автопауза
+        pauseTimers[key] = setTimeout(()=>{
+          a.pause();
+          a.currentTime = 0;
+        }, MAX_PLAY_MS);
       } catch(e){}
     }
 
-    /* ==== ЭФФЕКТЫ ==== */
+    /* ====== ЭФФЕКТЫ ====== */
     function svgPoint(evt){
       const pt = svg.createSVGPoint();
       const e = evt.touches ? evt.touches[0] : evt;
@@ -190,7 +204,7 @@
       }
     }
 
-    /* ==== ОБРАБОТЧИК КЛИКА ==== */
+    /* ====== КЛИК ====== */
     svg.addEventListener('click', (e)=>{
       const anchor = e.target.closest('a');
       if(!anchor) return;
@@ -204,19 +218,19 @@
       ripple(p.x, p.y);
       sparks(p.x, p.y, 14);
 
-      // звук по data-sound, если есть
+      // звук по data-sound
       const key = anchor.dataset.sound;
       if(key) playSound(key);
 
-      // переход спустя короткую паузу (если href валиден и не "#")
+      // переход (если есть валидный href и не "#")
       const href = anchor.getAttribute('href');
       const target = anchor.getAttribute('target') || '_self';
       setTimeout(()=>{
-        if(!href || href === '#') return; // не навигируем для плейсхолдеров
+        if(!href || href === '#') return;
         if(target==='_blank'){ window.open(href,'_blank','noopener'); }
         else{ location.href = href; }
       }, 320);
     }, {passive:false});
   </script>
 </body>
-          </html>
+</html>
