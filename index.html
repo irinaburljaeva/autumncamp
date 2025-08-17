@@ -95,9 +95,9 @@
         <polygon class="hotspot" data-type="house" points="1145.3441162109375,482.55999755859375 1329.6640625,461.0559997558594 1338.8800048828125,628.9920043945312 1137.50390625,617.2160034179688"/>
       </a>
 
-      <!-- КОМНАТА ОТДЫХА (без звука, можно добавить позже data-sound="...") -->
+      <!-- КОМНАТА ОТДЫХА (звук: relax.mp3, 3 сек) -->
       <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934696535"
-         target="_blank" rel="noopener" aria-label="Комната отдыха">
+         target="_blank" rel="noopener" aria-label="Комната отдыха" data-sound="relax">
         <title>Комната отдыха</title>
         <rect class="hotspot" data-type="label" x="886.0640869140625" y="897.280029296875" width="472.2718505859375" height="162.0159912109375" rx="16"/>
         <polygon class="hotspot" data-type="house" points="969.072021484375,783.7760009765625 1253.887939453125,805.1199951171875 1263.10400390625,954.6240234375 947.7119750976562,960.7680053710938"/>
@@ -109,6 +109,12 @@
         <rect class="hotspot" data-type="label" x="705" y="720" width="260" height="80" rx="16"/>
         <polygon class="hotspot" data-type="fire"
                  points="760,675 790,625 820,675 845,665 835,695 855,715 820,720 805,745 785,720 750,710"/>
+      </a>
+
+      <!-- УТКИ (звук: ducks.mp3, 3 сек) — эллипс над прудом -->
+      <a href="#" aria-label="Утки" data-sound="ducks">
+        <title>Утки</title>
+        <ellipse class="hotspot" cx="820" cy="560" rx="120" ry="70"/>
       </a>
 
       <!-- слой для эффектов -->
@@ -129,7 +135,9 @@
       rooms:   'rooms.mp3',
       birds:   'birds.mp3',
       cinema:  'cinema.mp3',
-      fire:    'fire.mp3'
+      relax:   'relax.mp3',
+      fire:    'fire.mp3',
+      ducks:   'ducks.mp3'
     };
 
     // создаём аудио-объекты
@@ -158,14 +166,14 @@
       if(!a) return;
 
       try {
-        // сбрасываем предыдущий автопаузер
+        // сбрасываем предыдущий автопаузер для этого звука
         if (pauseTimers[key]) clearTimeout(pauseTimers[key]);
 
         // быстрый перезапуск при повторных кликах
         a.currentTime = 0;
         a.play().catch(()=>{});
 
-        // автопауза
+        // автопауза через 3 секунды
         pauseTimers[key] = setTimeout(()=>{
           a.pause();
           a.currentTime = 0;
@@ -233,4 +241,4 @@
     }, {passive:false});
   </script>
 </body>
-</html>
+          </html>
