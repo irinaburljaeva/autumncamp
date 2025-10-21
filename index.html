@@ -22,52 +22,70 @@
 <body>
 <div class="wrap">
   <div class="board">
+    <!-- как в оригинале -->
     <img class="img" src="camp-map.jpg" alt="Карта"/>
 
-    <svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid meet" aria-label="Карта — кликабельные зоны">
+    <!-- viewBox под картинку 1139×768 -->
+    <svg viewBox="0 0 1139 768" preserveAspectRatio="xMidYMid meet" aria-label="Карта — кликабельные зоны">
+
+      <!-- СТОЛОВАЯ (левый верх) -->
       <a href="kitchen.html" target="_blank" rel="noopener" data-sound="kitchen" aria-label="Столовая">
-        <rect class="hotspot" x="250" y="350" width="180" height="90" rx="16"></rect>
+        <rect class="hotspot" x="190" y="205" width="230" height="110" rx="16"></rect>
       </a>
 
-      <a href="sport.html" target="_blank" rel="noopener" data-sound="sport" aria-label="Спортзал">
-        <rect class="hotspot" x="500" y="400" width="150" height="80" rx="16"></rect>
-      </a>
-
-      <a href="disco.html" target="_blank" rel="noopener" data-sound="disco" aria-label="Дискотека">
-        <rect class="hotspot" x="1050" y="300" width="160" height="90" rx="14"></rect>
-      </a>
-
-      <a href="rooms.html" target="_blank" rel="noopener" data-sound="rooms" aria-label="Комнаты отдыха">
-        <rect class="hotspot" x="900" y="650" width="180" height="90" rx="14"></rect>
-      </a>
-
-      <a href="cinema.html" target="_blank" rel="noopener" data-sound="cinema" aria-label="Кинозал">
-        <rect class="hotspot" x="1080" y="480" width="130" height="80" rx="14"></rect>
-      </a>
-
-      <a href="relax.html" target="_blank" rel="noopener" data-sound="relax" aria-label="Беседка">
-        <rect class="hotspot" x="300" y="650" width="120" height="90" rx="14"></rect>
-      </a>
-
-      <a href="fire.html" target="_blank" rel="noopener" data-sound="fire" aria-label="Костёр">
-        <circle class="hotspot" cx="460" cy="720" r="45"></circle>
-      </a>
-
+      <!-- ПАЛАТЫ (левый центр) -->
       <a href="ducks.html" target="_blank" rel="noopener" data-sound="ducks" aria-label="Палаты">
-        <rect class="hotspot" x="200" y="500" width="160" height="85" rx="14"></rect>
+        <rect class="hotspot" x="100" y="355" width="260" height="120" rx="16"></rect>
       </a>
 
-      <!-- новая локация -->
+      <!-- БЕСЕДКА (нижний левый) -->
+      <a href="relax.html" target="_blank" rel="noopener" data-sound="relax" aria-label="Беседка">
+        <rect class="hotspot" x="95" y="585" width="140" height="110" rx="16"></rect>
+      </a>
+
+      <!-- СПОРТЗАЛ (центр-лево) -->
+      <a href="sport.html" target="_blank" rel="noopener" data-sound="sport" aria-label="Спортзал">
+        <rect class="hotspot" x="435" y="305" width="160" height="115" rx="16"></rect>
+      </a>
+
+      <!-- ЦНМТ (большое здание по центру) -->
+      <a href="rooms.html" target="_blank" rel="noopener" data-sound="rooms" aria-label="ЦНМТ">
+        <polygon class="hotspot"
+          points="500,410 740,410 765,455 755,530 515,530 500,480"></polygon>
+      </a>
+
+      <!-- САНАТОРИЙ (табличка «Санаторий») -->
       <a href="sanatorium.html" target="_blank" rel="noopener" data-sound="sanatorium" aria-label="Санаторий">
-        <rect class="hotspot" x="700" y="520" width="210" height="100" rx="14"></rect>
+        <rect class="hotspot" x="415" y="585" width="235" height="60" rx="14"></rect>
+      </a>
+
+      <!-- КОСТЁР (низ, левее центра) -->
+      <a href="fire.html" target="_blank" rel="noopener" data-sound="fire" aria-label="Костёр">
+        <circle class="hotspot" cx="420" cy="655" r="48"></circle>
+      </a>
+
+      <!-- КОМНАТЫ ОТДЫХА (низ-право) -->
+      <a href="rooms.html" target="_blank" rel="noopener" data-sound="rooms" aria-label="Комнаты отдыха">
+        <rect class="hotspot" x="735" y="630" width="210" height="100" rx="16"></rect>
+      </a>
+
+      <!-- КИНОЗАЛ (правый центр) -->
+      <a href="cinema.html" target="_blank" rel="noopener" data-sound="cinema" aria-label="Кинозал">
+        <rect class="hotspot" x="855" y="450" width="165" height="100" rx="16"></rect>
+      </a>
+
+      <!-- ДИСКОТЕКА (правый верх) -->
+      <a href="disco.html" target="_blank" rel="noopener" data-sound="disco" aria-label="Дискотека">
+        <rect class="hotspot" x="760" y="240" width="205" height="95" rx="16"></rect>
       </a>
     </svg>
   </div>
 
-  <footer>Кликните по зданию — откроется страница и прозвучит короткий звук.</footer>
+  <footer>Кликните по зоне — откроется страница и прозвучит короткий звук.</footer>
 </div>
 
 <script>
+/* как в оригинале — только список пополнен санаторием */
 const soundFiles = {
   kitchen:    'kitchen.mp3',
   sport:      'sport.mp3',
