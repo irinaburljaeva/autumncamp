@@ -3,80 +3,37 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Карта — интерактивные локации</title>
+<title>Интерактивная карта</title>
 <style>
-  :root{
-    --ui-bg: #0b0c10;
-    --ui-fg: #e6e6e6;
-    --hl: #ff7300;
-  }
-  html,body{height:100%;margin:0;background:#111;color:#eee;font:16px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif}
+  html,body{height:100%;margin:0;background:#111;color:#eee;font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
   .wrap{max-width:1200px;margin:0 auto;padding:10px 12px 28px}
-  header{display:flex;gap:12px;align-items:center;justify-content:space-between;margin:8px 0 12px}
-  header .title{font-size:18px;font-weight:700;letter-spacing:.3px}
-  header .tips{opacity:.85;font-size:14px}
   .board{
-    position:relative;
-    background:#000;
-    border-radius:14px;
-    overflow:hidden;
+    position:relative;background:#000;border-radius:14px;overflow:hidden;
     box-shadow:0 15px 40px rgba(0,0,0,.35);
   }
-  .board .img{
-    display:block;width:100%;height:auto;vertical-align:top;user-select:none;pointer-events:none;
-    background:#000;
-  }
-  /* SVG над картой */
+  .board .img{display:block;width:100%;height:auto;vertical-align:top;user-select:none;pointer-events:none}
   svg{display:block;width:100%;height:auto}
-  a{cursor:pointer}
+  a{cursor:pointer;text-decoration:none}
   .hotspot{
-    fill:rgba(255,255,255,0); /* кликабельная, но невидимая по умолчанию */
-    stroke:transparent; stroke-width:2;
-    transition:fill .18s ease, stroke .18s ease;
+    fill:rgba(255,255,255,0);stroke:transparent;stroke-width:2;
+    transition:fill .18s ease,stroke .18s ease;
   }
-  a:focus .hotspot,
-  a:hover .hotspot{
-    fill:rgba(255,255,255,.06);
-    stroke:rgba(255,255,255,.25);
-  }
-  /* Debug-режим, вкл/выкл клавишей D */
-  .hotspot.debug{
-    fill: rgba(255, 165, 0, .18);
-    stroke: var(--hl);
-    stroke-width: 2.5;
-  }
-  /* Подписи (если нужны поверх) */
-  .label{
-    font: 600 14px/1.1 system-ui, sans-serif;
-    fill:#fff; pointer-events:none; text-shadow:0 1px 0 rgba(0,0,0,.4);
-  }
-  footer{opacity:.8;margin-top:12px;font-size:13px}
-  .kbd{display:inline-block;padding:.1em .4em;border:1px solid #666;border-bottom-color:#444;border-radius:6px;background:#1a1d22}
-  .muted{opacity:.7}
+  a:hover .hotspot{fill:rgba(255,255,255,.06);stroke:rgba(255,255,255,.25)}
+  footer{opacity:.8;margin-top:12px;font-size:13px;text-align:center}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <div class="title">Интерактивная карта</div>
-    <div class="tips">
-      <span class="kbd">D</span> — режим разметки,&nbsp;
-      <span class="kbd">Ctrl</span>+клик — вывести <span class="muted">x,y</span> в консоль
-    </div>
-  </header>
-
   <div class="board">
-    <!-- Фоновая картинка карты: замените на вашу -->
-    <img class="img" src="camp-map.jpg" alt="Карта" id="mapImg"/>
+    <!-- Фоновая картинка карты (замените путь при необходимости) -->
+    <img class="img" src="camp-map.jpg" alt="Карта"/>
 
-    <!-- Слой SVG с кликабельными зонами -->
-    <!-- width/height SVG должны соответствовать реальному размеру изображения карты -->
-    <svg id="mapSvg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid meet" aria-label="Карта — кликабельные зоны">
-      <!-- Примерный набор зон. Подгоняйте координаты (points/x/y/width/height). -->
+    <!-- Слой кликабельных зон -->
+    <!-- Если ваша карта другого размера, подгоните значения viewBox -->
+    <svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid meet" aria-label="Карта — кликабельные зоны">
       <!-- КУХНЯ -->
       <a href="https://example.com/kitchen" target="_blank" rel="noopener" data-sound="kitchen" aria-label="Кухня">
         <rect class="hotspot" x="180" y="740" width="220" height="110" rx="16"></rect>
-        <!-- <text class="label" x="190" y="730">Кухня</text> -->
       </a>
 
       <!-- СПОРТ -->
@@ -119,9 +76,9 @@
         <rect class="hotspot" x="140" y="530" width="170" height="95" rx="14"></rect>
       </a>
 
-      <!-- САНАТОРИЙ (НОВАЯ ЛОКАЦИЯ) -->
+      <!-- САНАТОРИЙ (новая локация) -->
       <a href="https://example.com/sanatorium" target="_blank" rel="noopener" data-sound="sanatorium" aria-label="Санаторий">
-        <!-- Табличка -->
+        <!-- Подпись-зона -->
         <rect class="hotspot" x="1180" y="870" width="300" height="88" rx="16"></rect>
         <!-- Контур здания -->
         <polygon class="hotspot" points="1205,780 1335,770 1370,845 1215,880"></polygon>
@@ -129,13 +86,11 @@
     </svg>
   </div>
 
-  <footer>
-    Если картинка карты другого размера — подгоните <code>viewBox</code> у SVG и координаты зон.
-  </footer>
+  <footer>Наведите на зону и кликните — откроется описание, прозвучит короткий звук.</footer>
 </div>
 
 <script>
-/* =================== НАСТРОЙКИ АУДИО =================== */
+/* ===== АУДИО: имена файлов подставьте свои при необходимости ===== */
 const soundFiles = {
   kitchen:    'kitchen.mp3',
   sport:      'sport.mp3',
@@ -146,7 +101,7 @@ const soundFiles = {
   relax:      'relax.mp3',
   fire:       'fire.mp3',
   ducks:      'ducks.mp3',
-  sanatorium: 'sanatorium.mp3' // новая локация
+  sanatorium: 'sanatorium.mp3'
 };
 
 // Предзагрузка аудио
@@ -157,55 +112,19 @@ for (const [key, file] of Object.entries(soundFiles)) {
   sounds[key] = a;
 }
 
-/* =================== ЛОГИКА КАРТЫ =================== */
-const svg = document.getElementById('mapSvg');
-const links = svg.querySelectorAll('a[data-sound]');
-let debugOn = false;
-
-// Включение/выключение режима разметки (D)
-document.addEventListener('keydown', (e)=>{
-  if (e.key.toLowerCase() === 'd'){
-    debugOn = !debugOn;
-    svg.querySelectorAll('.hotspot').forEach(el=>{
-      el.classList.toggle('debug', debugOn);
-    });
-  }
-});
-
-// Ctrl+клик по карте → вывести координаты точки под курсором
-svg.addEventListener('click', (e)=>{
-  if (!e.ctrlKey) return;
-  e.preventDefault();
-  const pt = (()=>{
-    const p = svg.createSVGPoint();
-    const src = e.touches ? e.touches[0] : e;
-    p.x = src.clientX; p.y = src.clientY;
-    return p.matrixTransform(svg.getScreenCTM().inverse());
-  })();
-  console.log(`x=${pt.x.toFixed(1)}, y=${pt.y.toFixed(1)}`);
-});
-
-// Воспроизведение звука при клике по зоне
-links.forEach(a=>{
-  a.addEventListener('click', (e)=>{
-    // Звук: 3 секунды, без блокировки перехода по ссылке (откроется в новой вкладке)
+// Проигрываем до 3 секунд при клике по зоне (ссылка откроется в новой вкладке)
+document.querySelectorAll('svg a[data-sound]').forEach(a=>{
+  a.addEventListener('click', ()=>{
     const key = a.getAttribute('data-sound');
     const audio = sounds[key];
-    if (audio){
-      try{
-        audio.currentTime = 0;
-        audio.play().catch(()=>{ /* игнорируем авто-блокировку браузера */ });
-        setTimeout(()=>{ try{ audio.pause(); }catch(_){} }, 3000);
-      }catch(_){}
-    }
+    if (!audio) return;
+    try{
+      audio.currentTime = 0;
+      audio.play().catch(()=>{});
+      setTimeout(()=>{ try{ audio.pause(); }catch(_){ } }, 3000);
+    }catch(_){}
   });
 });
-
-/* ====== ХЕЛПЕР: если фон у карты нестандартный ======
-   Если заменили изображение и оно другого размера,
-   подгоните viewBox у SVG под реальный размер пикселей карты.
-   Например, если карта 1920x1080 → viewBox="0 0 1920 1080".
-======================================================= */
 </script>
 </body>
 </html>
