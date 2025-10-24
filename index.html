@@ -5,17 +5,13 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Пионер-лагерь «Шагай дома» — карта</title>
 <style>
-  html,body{height:100%;margin:0;background:#111;color:#eee;font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+  html,body{height:100%;margin:0;background:#fff;color:#111;font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
   .wrap{max-width:1200px;margin:0 auto;padding:10px 12px 28px}
-  .board{position:relative;background:#000;border-radius:14px;overflow:hidden;box-shadow:0 15px 40px rgba(0,0,0,.35)}
+  .board{position:relative;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 15px 40px rgba(0,0,0,.08)}
   svg{display:block;width:100%;height:auto}
   a{cursor:pointer;text-decoration:none}
-  .hotspot{
-    fill:rgba(255,255,255,0);stroke:transparent;stroke-width:2;
-    transition:fill .18s ease,stroke .18s ease;
-  }
-  a:hover .hotspot{fill:rgba(255,255,255,.06);stroke:rgba(255,255,255,.25)}
-  footer{opacity:.8;margin-top:12px;font-size:13px;text-align:center}
+  /* кликабельные зоны невидимы и без подсветки */
+  .hotspot{fill:rgba(255,255,255,0);stroke:transparent;stroke-width:2}
 </style>
 </head>
 <body>
@@ -29,7 +25,7 @@
 
       <!-- БЕСЕДКА — Чат интенсива и чек-лист-дневник -->
       <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934933829"
-         target="_blank" rel="noopener" data-sound="relax" aria-label="Беседка">
+         target="_blank" rel="noopener" data-sound="birds" aria-label="Беседка">
         <rect class="hotspot" x="78.1" y="520.2" width="171.1" height="176.1" rx="16"></rect>
       </a>
 
@@ -53,14 +49,14 @@
 
       <!-- САНАТОРИЙ ЦНМТ (центральное здание) -->
       <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934933836"
-         target="_blank" rel="noopener" data-sound="sanatorium" aria-label="Санаторий ЦНМТ">
+         target="_blank" rel="noopener" data-sound="medical" aria-label="Санаторий ЦНМТ">
         <polygon class="hotspot"
           points="418.4,400.8 641.5,417.7 631.5,493.8 603.4,628.4 369.8,624.5 389.8,508.4"></polygon>
       </a>
 
       <!-- ПАЛАТЫ -->
       <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934933835"
-         target="_blank" rel="noopener" data-sound="ducks" aria-label="Палаты">
+         target="_blank" rel="noopener" data-sound="rooms" aria-label="Палаты">
         <rect class="hotspot" x="55.9" y="297.9" width="260.0" height="164.1" rx="16"></rect>
       </a>
 
@@ -72,50 +68,54 @@
 
       <!-- КОМНАТА ОТДЫХА -->
       <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934933838"
-         target="_blank" rel="noopener" data-sound="rooms" aria-label="Комната отдыха">
+         target="_blank" rel="noopener" data-sound="relax" aria-label="Комната отдыха">
         <rect class="hotspot" x="654.7" y="496.5" width="289.0" height="181.6" rx="16"></rect>
       </a>
 
-      <!-- КОСТЁР (ссылка якорем к санаторию — как раньше) -->
+      <!-- КОСТЁР (якорь к санаторию) -->
       <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934933836#koster"
          target="_blank" rel="noopener" data-sound="fire" aria-label="Костёр">
         <circle class="hotspot" cx="333.1" cy="695.2" r="66.2"></circle>
       </a>
     </svg>
   </div>
-
-  <footer>Кликните по зоне — откроется страница и прозвучит короткий звук.</footer>
 </div>
 
 <script>
-/* звуки (как в оригинале) */
+/* звуки — обновлённые названия файлов */
 const soundFiles = {
-  kitchen:'kitchen.mp3',
-  sport:'sport.mp3',
-  disco:'disco.mp3',
-  rooms:'rooms.mp3',
-  cinema:'cinema.mp3',
-  relax:'relax.mp3',
-  fire:'fire.mp3',
-  ducks:'ducks.mp3',
-  sanatorium:'sanatorium.mp3'
+  kitchen: 'kitchen.mp3',
+  sport:   'sport.mp3',
+  disco:   'tell.mp3',     // до 5 секунд
+  rooms:   'rooms.mp3',    // палаты
+  cinema:  'cinema.mp3',
+  relax:   'relax.mp3',    // комната отдыха
+  birds:   'birds.mp3',    // беседка
+  fire:    'fire.mp3',
+  medical: 'medical.mp3'   // санаторий
 };
+
+// предзагрузка
 const sounds = {};
 for (const [k, path] of Object.entries(soundFiles)) {
   const a = new Audio(path);
   a.preload = 'auto';
   sounds[k] = a;
 }
-/* воспроизводим до 3 секунд при клике по зоне; страница открывается в новой вкладке */
+
+/* длительность: по умолчанию 3 сек, для дискотеки 5 сек */
+const DUR_MS = { default: 3000, disco: 5000 };
+
 document.querySelectorAll('svg a[data-sound]').forEach(a=>{
   a.addEventListener('click', ()=>{
     const key = a.getAttribute('data-sound');
     const audio = sounds[key];
     if (!audio) return;
+    const dur = (key === 'disco') ? DUR_MS.disco : DUR_MS.default;
     try{
       audio.currentTime = 0;
       audio.play().catch(()=>{});
-      setTimeout(()=>{ try{ audio.pause(); }catch(_){ } }, 3000);
+      setTimeout(()=>{ try{ audio.pause(); }catch(_){ } }, dur);
     }catch(_){}
   });
 });
