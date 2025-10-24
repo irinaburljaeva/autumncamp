@@ -9,12 +9,14 @@
   .wrap{max-width:1200px;margin:0 auto;padding:10px 12px 28px}
   .board{position:relative;background:#000;border-radius:14px;overflow:hidden;box-shadow:0 15px 40px rgba(0,0,0,.35)}
   svg{display:block;width:100%;height:auto}
+
   a{cursor:pointer;text-decoration:none}
   .hotspot{
     fill:rgba(255,255,255,0);stroke:transparent;stroke-width:2;
     transition:fill .18s ease,stroke .18s ease;
   }
   a:hover .hotspot{fill:rgba(255,255,255,.06);stroke:rgba(255,255,255,.25)}
+
   .toolbar{
     position:sticky;top:0;z-index:10;display:flex;gap:8px;align-items:center;
     padding:8px 0 12px
@@ -25,12 +27,22 @@
   }
   .btn[aria-pressed="true"]{background:#2b3646;border-color:#3f5877}
   .hint{opacity:.75;font-size:13px}
-  /* Подсветка зон в режиме правки */
+
+  /* Подсветка зон и ручек в режиме правки */
   .edit .hotspot{
     fill:rgba(255,165,0,.16)!important;
     stroke:#ff8a1f!important;
     stroke-width:2.5
   }
+  .handle{
+    fill:#fff;stroke:#ff8a1f;stroke-width:1.5;cursor:nwse-resize;
+  }
+  .handle.mid{cursor:ns-resize}
+  .handle.mid.h{cursor:ew-resize}
+  .handle.circle{cursor:ew-resize}
+  .handle.poly{cursor:grab}
+  .handle.poly:active{cursor:grabbing}
+
   .badge{
     position:absolute;right:12px;bottom:12px;background:#1b2230;color:#d7e2ff;
     border:1px solid #33405a;border-radius:10px;padding:6px 10px;font-size:12px;opacity:.85
@@ -43,70 +55,72 @@
   <div class="toolbar">
     <button id="toggleEdit" class="btn" aria-pressed="false">Режим правки: ВКЛ</button>
     <button id="copyAll" class="btn">Скопировать координаты</button>
-    <span class="hint">Перетаскивай зоны мышкой. Координаты печатаются в консоль. Ctrl+клик по карте — показать X,Y под курсором.</span>
+    <span class="hint">Тяни зоны и ручки. Координаты печатаются в консоль. Ctrl+клик по карте — X,Y под курсором.</span>
   </div>
 
   <div class="board">
-    <!-- ЕДИНЫЙ SVG: внутри картинка и кликабельные зоны -->
-    <!-- ВАЖНО: viewBox = реальный размер camp-map.jpg -->
+    <!-- ЕДИНЫЙ SVG (картинка + зоны) -->
     <svg id="map" viewBox="0 0 1139 768" preserveAspectRatio="xMidYMid meet" aria-label="Интерактивная карта">
       <!-- фон-карта как в оригинале -->
       <image href="camp-map.jpg" x="0" y="0" width="1139" height="768"/>
 
-      <!-- СТОЛОВАЯ -->
-      <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934933830"
-         target="_blank" rel="noopener" data-sound="kitchen" data-name="Столовая">
-        <rect class="hotspot" x="190" y="205" width="230" height="110" rx="16"></rect>
-      </a>
-
-      <!-- ПАЛАТЫ -->
-      <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934933835"
-         target="_blank" rel="noopener" data-sound="ducks" data-name="Палаты">
-        <rect class="hotspot" x="100" y="355" width="260" height="120" rx="16"></rect>
-      </a>
-
       <!-- БЕСЕДКА (Чат интенсива и чек-лист-дневник) -->
       <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934933829"
          target="_blank" rel="noopener" data-sound="relax" data-name="Беседка">
-        <rect class="hotspot" x="95" y="585" width="140" height="110" rx="16"></rect>
+        <rect class="hotspot" x="89.8" y="544.8" width="140" height="110" rx="16"></rect>
+      </a>
+
+      <!-- СТОЛОВАЯ -->
+      <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934933830"
+         target="_blank" rel="noopener" data-sound="kitchen" data-name="Столовая">
+        <rect class="hotspot" x="186.1" y="131.1" width="230" height="110" rx="16"></rect>
       </a>
 
       <!-- СПОРТИВНЫЙ ЗАЛ -->
       <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934933831"
          target="_blank" rel="noopener" data-sound="sport" data-name="Спортивный зал">
-        <rect class="hotspot" x="435" y="305" width="160" height="115" rx="16"></rect>
+        <rect class="hotspot" x="363.7" y="248.0" width="160" height="115" rx="16"></rect>
+      </a>
+
+      <!-- ШАГАТЕЛЬНАЯ ДИСКОТЕКА -->
+      <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934933833"
+         target="_blank" rel="noopener" data-sound="disco" data-name="Шагательная дискотека">
+        <rect class="hotspot" x="653.7" y="172.6" width="205" height="95" rx="16"></rect>
       </a>
 
       <!-- САНАТОРИЙ ЦНМТ (центральное здание) -->
       <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934933836"
          target="_blank" rel="noopener" data-sound="sanatorium" data-name="Санаторий ЦНМТ">
         <polygon class="hotspot"
-          points="500,410 740,410 765,455 755,530 515,530 500,480"></polygon>
+          points="366.5,448.8 606.5,448.8 631.5,493.8 621.5,568.8 381.5,568.8 366.5,518.8"></polygon>
       </a>
 
-      <!-- КОСТЁР -->
-      <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934933836#koster"
-         target="_blank" rel="noopener" data-sound="fire" data-name="Костёр">
-        <circle class="hotspot" cx="420" cy="655" r="48"></circle>
-      </a>
-
-      <!-- КОМНАТА ОТДЫХА -->
-      <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934933838"
-         target="_blank" rel="noopener" data-sound="rooms" data-name="Комната отдыха">
-        <rect class="hotspot" x="735" y="630" width="210" height="100" rx="16"></rect>
+      <!-- ПАЛАТЫ -->
+      <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934933835"
+         target="_blank" rel="noopener" data-sound="ducks" data-name="Палаты">
+        <rect class="hotspot" x="55.9" y="309.6" width="260" height="120" rx="16"></rect>
       </a>
 
       <!-- КИНОЗАЛ -->
       <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934933837"
          target="_blank" rel="noopener" data-sound="cinema" data-name="Кинозал">
-        <rect class="hotspot" x="855" y="450" width="165" height="100" rx="16"></rect>
+        <rect class="hotspot" x="792.8" y="323.0" width="165" height="100" rx="16"></rect>
       </a>
 
-      <!-- ШАГАТЕЛЬНАЯ ДИСКОТЕКА -->
-      <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934933833"
-         target="_blank" rel="noopener" data-sound="disco" data-name="Шагательная дискотека">
-        <rect class="hotspot" x="760" y="240" width="205" height="95" rx="16"></rect>
+      <!-- КОМНАТА ОТДЫХА -->
+      <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934933838"
+         target="_blank" rel="noopener" data-sound="rooms" data-name="Комната отдыха">
+        <rect class="hotspot" x="680.6" y="522.4" width="210" height="100" rx="16"></rect>
       </a>
+
+      <!-- КОСТЁР -->
+      <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934933836#koster"
+         target="_blank" rel="noopener" data-sound="fire" data-name="Костёр">
+        <circle class="hotspot" cx="333.1" cy="700.4" r="48"></circle>
+      </a>
+
+      <!-- слой ручек редактирования -->
+      <g id="handles"></g>
     </svg>
 
     <div class="badge" id="badge" hidden>Режим правки</div>
@@ -114,7 +128,7 @@
 </div>
 
 <script>
-/* ===== звуки (как в оригинале) ===== */
+/* ===== звуки ===== */
 const soundFiles = {
   kitchen:'kitchen.mp3',
   sport:'sport.mp3',
@@ -129,19 +143,22 @@ const soundFiles = {
 const sounds={};
 for(const[k,f] of Object.entries(soundFiles)){const a=new Audio(f);a.preload='auto';sounds[k]=a;}
 document.querySelectorAll('svg a[data-sound]').forEach(a=>{
-  a.addEventListener('click',()=>{
+  a.addEventListener('click',(e)=>{
+    // в режиме правки ссылки не открываем
+    if(document.body.classList.contains('edit')){ e.preventDefault(); return; }
     const key=a.getAttribute('data-sound'); const s=sounds[key]; if(!s)return;
     try{s.currentTime=0;s.play().catch(()=>{});setTimeout(()=>{try{s.pause();}catch(_){ }},3000);}catch(_){}
   });
 });
 
-/* ===== режим правки: перетаскивание зон ===== */
+/* ===== режим правки ===== */
 const svg = document.getElementById('map');
-const board = document.querySelector('.board');
 const toggleBtn = document.getElementById('toggleEdit');
 const copyBtn = document.getElementById('copyAll');
 const badge = document.getElementById('badge');
-let edit = false;
+const handlesLayer = document.getElementById('handles');
+
+let edit=false, selectedEl=null, drag=null;
 
 toggleBtn.addEventListener('click', ()=>{
   edit = !edit;
@@ -149,48 +166,55 @@ toggleBtn.addEventListener('click', ()=>{
   toggleBtn.setAttribute('aria-pressed', String(edit));
   toggleBtn.textContent = 'Режим правки: ' + (edit ? 'ВЫКЛ' : 'ВКЛ');
   badge.hidden = !edit;
+  if(!edit){ clearHandles(); selectedEl=null; }
 });
 
-/* перевод координат экрана в координаты SVG */
 function clientToSvg(e){
-  const pt = svg.createSVGPoint();
-  pt.x = (e.touches? e.touches[0].clientX : e.clientX);
-  pt.y = (e.touches? e.touches[0].clientY : e.clientY);
+  const pt=svg.createSVGPoint();
+  pt.x=(e.touches? e.touches[0].clientX : e.clientX);
+  pt.y=(e.touches? e.touches[0].clientY : e.clientY);
   return pt.matrixTransform(svg.getScreenCTM().inverse());
 }
 
-let drag = null;
+/* выбор элемента для редактирования */
+svg.addEventListener('mousedown', (e)=>{
+  if(!edit) return;
+  const t = e.target;
+  if(t.classList && t.classList.contains('hotspot')){
+    e.preventDefault();
+    selectEl(t);
+    startMove(e, t);
+  }
+});
+svg.addEventListener('touchstart', (e)=>{
+  if(!edit) return;
+  const t = e.target;
+  if(t.classList && t.classList.contains('hotspot')){
+    e.preventDefault();
+    selectEl(t);
+    startMove(e, t);
+  }
+},{passive:false});
 
-svg.addEventListener('mousedown', startDrag);
-svg.addEventListener('touchstart', startDrag, {passive:false});
+/* перемещение всей фигуры */
+function startMove(e, el){
+  const p = clientToSvg(e);
+  drag = {
+    mode:'move', el, type:el.tagName.toLowerCase(), start:p,
+    x:+el.getAttribute('x')||0,
+    y:+el.getAttribute('y')||0,
+    w:+el.getAttribute('width')||0,
+    h:+el.getAttribute('height')||0,
+    cx:+el.getAttribute('cx')||0,
+    cy:+el.getAttribute('cy')||0,
+    r:+el.getAttribute('r')||0,
+    points: el.getAttribute('points')
+  };
+}
 svg.addEventListener('mousemove', onDrag);
 svg.addEventListener('touchmove', onDrag, {passive:false});
 window.addEventListener('mouseup', endDrag);
 window.addEventListener('touchend', endDrag);
-
-function startDrag(e){
-  if(!edit) return;
-  const target = e.target;
-  if(!(target.classList && target.classList.contains('hotspot'))) return;
-
-  e.preventDefault();
-  const p = clientToSvg(e);
-
-  drag = {
-    el: target,
-    type: target.tagName.toLowerCase(),
-    start: p,
-    // исходные атрибуты
-    x: +target.getAttribute('x')||0,
-    y: +target.getAttribute('y')||0,
-    w: +target.getAttribute('width')||0,
-    h: +target.getAttribute('height')||0,
-    cx: +target.getAttribute('cx')||0,
-    cy: +target.getAttribute('cy')||0,
-    r:  +target.getAttribute('r')||0,
-    points: target.getAttribute('points')
-  };
-}
 
 function onDrag(e){
   if(!drag) return;
@@ -199,51 +223,208 @@ function onDrag(e){
   const dx = p.x - drag.start.x;
   const dy = p.y - drag.start.y;
 
-  if(drag.type==='rect'){
-    drag.el.setAttribute('x', (drag.x + dx).toFixed(1));
-    drag.el.setAttribute('y', (drag.y + dy).toFixed(1));
-  }else if(drag.type==='circle'){
-    drag.el.setAttribute('cx', (drag.cx + dx).toFixed(1));
-    drag.el.setAttribute('cy', (drag.cy + dy).toFixed(1));
-  }else if(drag.type==='polygon'){
-    const pts = drag.points.trim().split(/\s+/).map(pt=>{
-      const [px,py]=pt.split(',').map(Number);
-      return (px+dx).toFixed(1)+','+(py+dy).toFixed(1);
-    }).join(' ');
-    drag.el.setAttribute('points', pts);
+  if(drag.mode==='move'){
+    if(drag.type==='rect'){
+      drag.el.setAttribute('x',(drag.x+dx).toFixed(1));
+      drag.el.setAttribute('y',(drag.y+dy).toFixed(1));
+    }else if(drag.type==='circle'){
+      drag.el.setAttribute('cx',(drag.cx+dx).toFixed(1));
+      drag.el.setAttribute('cy',(drag.cy+dy).toFixed(1));
+    }else if(drag.type==='polygon'){
+      const pts = drag.points.trim().split(/\s+/).map(pt=>{
+        const [px,py]=pt.split(',').map(Number);
+        return (px+dx).toFixed(1)+','+(py+dy).toFixed(1);
+      }).join(' ');
+      drag.el.setAttribute('points', pts);
+    }
+    refreshHandles();
+  }else if(drag.mode==='resize-rect'){
+    resizeRect(drag.el, drag.handle, p);
+  }else if(drag.mode==='resize-circle'){
+    resizeCircle(drag.el, p);
+  }else if(drag.mode==='move-vertex'){
+    moveVertex(drag.el, drag.vertexIndex, p);
   }
 }
 
 function endDrag(){
   if(!drag) return;
-  // печатаем обновлённые атрибуты в консоль
-  const el = drag.el;
-  const parentA = el.closest('a');
-  const name = parentA?.dataset.name || parentA?.getAttribute('aria-label') || el.tagName;
-
-  if(drag.type==='rect'){
-    const x=el.getAttribute('x'), y=el.getAttribute('y'),
-          w=el.getAttribute('width'), h=el.getAttribute('height');
-    console.log(`[${name}] rect: x=${x}, y=${y}, width=${w}, height=${h}`);
-  }else if(drag.type==='circle'){
-    const cx=el.getAttribute('cx'), cy=el.getAttribute('cy'), r=el.getAttribute('r');
-    console.log(`[${name}] circle: cx=${cx}, cy=${cy}, r=${r}`);
-  }else if(drag.type==='polygon'){
-    const pts=el.getAttribute('points');
-    console.log(`[${name}] polygon points="${pts}"`);
-  }
-  drag = null;
+  logShape(drag.el);
+  drag=null;
 }
 
-/* Ctrl+клик — вывести X,Y под курсором (для точной разметки) */
+/* ========= выбор и ручки ========= */
+function selectEl(el){
+  selectedEl = el;
+  refreshHandles();
+}
+function clearHandles(){ handlesLayer.innerHTML=''; }
+
+function refreshHandles(){
+  clearHandles();
+  if(!selectedEl) return;
+
+  const type = selectedEl.tagName.toLowerCase();
+  if(type==='rect'){
+    addRectHandles(selectedEl);
+  }else if(type==='circle'){
+    addCircleHandle(selectedEl);
+  }else if(type==='polygon'){
+    addPolygonHandles(selectedEl);
+  }
+}
+
+/* ======== РУЧКИ ДЛЯ RECT (8 шт) ======== */
+function addRectHandles(r){
+  const x=+r.getAttribute('x'), y=+r.getAttribute('y');
+  const w=+r.getAttribute('width'), h=+r.getAttribute('height');
+  const s=8; // размер ручки
+
+  const points = [
+    {id:'nw', x:x,       y:y},        // углы
+    {id:'n',  x:x+w/2,   y:y},
+    {id:'ne', x:x+w,     y:y},
+    {id:'e',  x:x+w,     y:y+h/2},
+    {id:'se', x:x+w,     y:y+h},
+    {id:'s',  x:x+w/2,   y:y+h},
+    {id:'sw', x:x,       y:y+h},
+    {id:'w',  x:x,       y:y+h/2}
+  ];
+
+  points.forEach(p=>{
+    const handle = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    handle.setAttribute('class','handle'+(p.id==='n'||p.id==='s'?' mid':'')+(p.id==='e'||p.id==='w'?' h':''));
+    handle.setAttribute('x',(p.x-s/2)); handle.setAttribute('y',(p.y-s/2));
+    handle.setAttribute('width',s); handle.setAttribute('height',s);
+    handle.dataset.kind = 'rect';
+    handle.dataset.handle = p.id;
+    handle.addEventListener('mousedown', e=>startRectResize(e, r, p.id));
+    handle.addEventListener('touchstart', e=>startRectResize(e, r, p.id), {passive:false});
+    handlesLayer.appendChild(handle);
+  });
+}
+
+function startRectResize(e, r, handleId){
+  e.preventDefault();
+  drag = {
+    mode:'resize-rect', el:r, type:'rect', handle:handleId,
+    x:+r.getAttribute('x'), y:+r.getAttribute('y'),
+    w:+r.getAttribute('width'), h:+r.getAttribute('height'),
+    start: clientToSvg(e)
+  };
+}
+
+function resizeRect(r, handleId, p){
+  const minW=10, minH=10;
+  let x=drag.x, y=drag.y, w=drag.w, h=drag.h;
+  const dx = p.x - drag.start.x;
+  const dy = p.y - drag.start.y;
+
+  // тянем стороны в зависимости от ручки
+  if(handleId.includes('e')) w = drag.w + dx;
+  if(handleId.includes('s')) h = drag.h + dy;
+  if(handleId.includes('w')){ x = drag.x + dx; w = drag.w - dx; }
+  if(handleId.includes('n')){ y = drag.y + dy; h = drag.h - dy; }
+
+  w = Math.max(minW, w);
+  h = Math.max(minH, h);
+
+  r.setAttribute('x', x.toFixed(1));
+  r.setAttribute('y', y.toFixed(1));
+  r.setAttribute('width', w.toFixed(1));
+  r.setAttribute('height', h.toFixed(1));
+
+  refreshHandles();
+}
+
+/* ======== РУЧКА ДЛЯ CIRCLE (радиус) ======== */
+function addCircleHandle(c){
+  const cx=+c.getAttribute('cx'), cy=+c.getAttribute('cy'), r=+c.getAttribute('r');
+  const s=8;
+  const handle = document.createElementNS('http://www.w3.org/2000/svg','rect');
+  handle.setAttribute('class','handle circle');
+  handle.setAttribute('x', (cx+r - s/2));
+  handle.setAttribute('y', (cy - s/2));
+  handle.setAttribute('width', s); handle.setAttribute('height', s);
+  handle.addEventListener('mousedown', e=>startCircleResize(e, c));
+  handle.addEventListener('touchstart', e=>startCircleResize(e, c), {passive:false});
+  handlesLayer.appendChild(handle);
+}
+function startCircleResize(e, c){
+  e.preventDefault();
+  const cx=+c.getAttribute('cx'), cy=+c.getAttribute('cy'), r=+c.getAttribute('r');
+  drag = { mode:'resize-circle', el:c, type:'circle', cx, cy, r, start: clientToSvg(e) };
+}
+function resizeCircle(c, p){
+  const dx = p.x - drag.cx;
+  const dy = p.y - drag.cy;
+  const rr = Math.max(5, Math.hypot(dx, dy));
+  c.setAttribute('r', rr.toFixed(1));
+  refreshHandles();
+}
+
+/* ======== РУЧКИ ДЛЯ POLYGON (вершины) ======== */
+function addPolygonHandles(poly){
+  const pts = poly.getAttribute('points').trim().split(/\s+/).map(pt=>pt.split(',').map(Number));
+  const s=8;
+  pts.forEach(([px,py], i)=>{
+    const h = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    h.setAttribute('class','handle poly');
+    h.setAttribute('x', (px - s/2)); h.setAttribute('y', (py - s/2));
+    h.setAttribute('width', s); h.setAttribute('height', s);
+    h.dataset.index = String(i);
+    h.addEventListener('mousedown', e=>startVertexMove(e, poly, i));
+    h.addEventListener('touchstart', e=>startVertexMove(e, poly, i), {passive:false});
+    handlesLayer.appendChild(h);
+  });
+}
+function startVertexMove(e, poly, i){
+  e.preventDefault();
+  drag = {
+    mode:'move-vertex', el:poly, type:'polygon',
+    vertexIndex:i, start: clientToSvg(e),
+    points: poly.getAttribute('points')
+  };
+}
+function moveVertex(poly, idx, p){
+  const orig = drag.points.trim().split(/\s+/).map(pt=>pt.split(',').map(Number));
+  // смещение = текущая позиция − старт
+  const dx = p.x - drag.start.x;
+  const dy = p.y - drag.start.y;
+  // двигаем только idx-вершину
+  const moved = orig.map(([x,y],i)=> i===idx ? [x+dx, y+dy] : [x,y]);
+  poly.setAttribute('points', moved.map(([x,y])=>`${x.toFixed(1)},${y.toFixed(1)}`).join(' '));
+  refreshHandles();
+}
+
+/* ===== лог ===== */
+function logShape(el){
+  const a = el.closest('a');
+  const name = a?.dataset.name || a?.getAttribute('aria-label') || el.tagName;
+  const tag = el.tagName.toLowerCase();
+  if(tag==='rect'){
+    const x=el.getAttribute('x'), y=el.getAttribute('y'),
+          w=el.getAttribute('width'), h=el.getAttribute('height'),
+          rx=el.getAttribute('rx')||0;
+    console.log(`<rect class="hotspot" x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}"></rect> <!-- ${name} -->`);
+  }else if(tag==='circle'){
+    const cx=el.getAttribute('cx'), cy=el.getAttribute('cy'), r=el.getAttribute('r');
+    console.log(`<circle class="hotspot" cx="${cx}" cy="${cy}" r="${r}"></circle> <!-- ${name} -->`);
+  }else if(tag==='polygon'){
+    const pts=el.getAttribute('points');
+    console.log(`<polygon class="hotspot" points="${pts}"></polygon> <!-- ${name} -->`);
+  }
+}
+
+/* Ctrl+клик — вывести X,Y под курсором */
 svg.addEventListener('click', (e)=>{
   if(!e.ctrlKey) return;
   const p = clientToSvg(e);
   console.log(`x=${p.x.toFixed(1)}, y=${p.y.toFixed(1)}`);
 });
 
-/* Скопировать все координаты всех зон (в буфер) */
-copyBtn.addEventListener('click', ()=>{
+/* Копировать все координаты всех зон (в буфер) */
+document.getElementById('copyAll').addEventListener('click', ()=>{
   const zones = Array.from(svg.querySelectorAll('.hotspot')).map(el=>{
     const tag = el.tagName.toLowerCase();
     const a = el.closest('a');
@@ -258,8 +439,8 @@ copyBtn.addEventListener('click', ()=>{
     return '';
   }).join('\n');
   navigator.clipboard.writeText(zones).then(()=>{
-    copyBtn.textContent = 'Скопировано!';
-    setTimeout(()=>copyBtn.textContent='Скопировать координаты', 1200);
+    const b=document.getElementById('copyAll'); const t=b.textContent;
+    b.textContent='Скопировано!'; setTimeout(()=>b.textContent=t,1200);
   });
 });
 </script>
