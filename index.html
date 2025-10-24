@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Интерактивная карта</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Пионер-лагерь «Шагай дома» — карта</title>
 <style>
   html,body{height:100%;margin:0;background:#111;color:#eee;font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
   .wrap{max-width:1200px;margin:0 auto;padding:10px 12px 28px}
   .board{position:relative;background:#000;border-radius:14px;overflow:hidden;box-shadow:0 15px 40px rgba(0,0,0,.35)}
-  /* Один SVG со встроенным изображением — клики и координаты совпадают */
   svg{display:block;width:100%;height:auto}
   a{cursor:pointer;text-decoration:none}
   .hotspot{
@@ -16,75 +15,106 @@
     transition:fill .18s ease,stroke .18s ease;
   }
   a:hover .hotspot{fill:rgba(255,255,255,.06);stroke:rgba(255,255,255,.25)}
-  footer{opacity:.8;margin-top:12px;font-size:13px;text-align:center}
+  .toolbar{
+    position:sticky;top:0;z-index:10;display:flex;gap:8px;align-items:center;
+    padding:8px 0 12px
+  }
+  .btn{
+    background:#1e252f;color:#fff;border:1px solid #303845;border-radius:10px;
+    padding:8px 14px;font-size:14px;cursor:pointer
+  }
+  .btn[aria-pressed="true"]{background:#2b3646;border-color:#3f5877}
+  .hint{opacity:.75;font-size:13px}
+  /* Подсветка зон в режиме правки */
+  .edit .hotspot{
+    fill:rgba(255,165,0,.16)!important;
+    stroke:#ff8a1f!important;
+    stroke-width:2.5
+  }
+  .badge{
+    position:absolute;right:12px;bottom:12px;background:#1b2230;color:#d7e2ff;
+    border:1px solid #33405a;border-radius:10px;padding:6px 10px;font-size:12px;opacity:.85
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
+
+  <div class="toolbar">
+    <button id="toggleEdit" class="btn" aria-pressed="false">Режим правки: ВКЛ</button>
+    <button id="copyAll" class="btn">Скопировать координаты</button>
+    <span class="hint">Перетаскивай зоны мышкой. Координаты печатаются в консоль. Ctrl+клик по карте — показать X,Y под курсором.</span>
+  </div>
+
   <div class="board">
-    <!-- ЕДИНЫЙ SVG. Внутри — картинка и зоны. -->
-    <!-- ВАЖНО: viewBox = реальный размер картинки -->
-    <svg id="map" viewBox="0 0 1139 768" preserveAspectRatio="xMidYMid meet" aria-label="Карта — кликабельные зоны">
-      <!-- Фоновая картинка (как в оригинале) -->
-      <image href="camp-map.jpg" x="0" y="0" width="1139" height="768" />
+    <!-- ЕДИНЫЙ SVG: внутри картинка и кликабельные зоны -->
+    <!-- ВАЖНО: viewBox = реальный размер camp-map.jpg -->
+    <svg id="map" viewBox="0 0 1139 768" preserveAspectRatio="xMidYMid meet" aria-label="Интерактивная карта">
+      <!-- фон-карта как в оригинале -->
+      <image href="camp-map.jpg" x="0" y="0" width="1139" height="768"/>
 
       <!-- СТОЛОВАЯ -->
-      <a href="kitchen.html" target="_blank" rel="noopener" data-sound="kitchen" aria-label="Столовая">
+      <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934933830"
+         target="_blank" rel="noopener" data-sound="kitchen" data-name="Столовая">
         <rect class="hotspot" x="190" y="205" width="230" height="110" rx="16"></rect>
       </a>
 
       <!-- ПАЛАТЫ -->
-      <a href="ducks.html" target="_blank" rel="noopener" data-sound="ducks" aria-label="Палаты">
+      <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934933835"
+         target="_blank" rel="noopener" data-sound="ducks" data-name="Палаты">
         <rect class="hotspot" x="100" y="355" width="260" height="120" rx="16"></rect>
       </a>
 
-      <!-- БЕСЕДКА -->
-      <a href="relax.html" target="_blank" rel="noopener" data-sound="relax" aria-label="Беседка">
+      <!-- БЕСЕДКА (Чат интенсива и чек-лист-дневник) -->
+      <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934933829"
+         target="_blank" rel="noopener" data-sound="relax" data-name="Беседка">
         <rect class="hotspot" x="95" y="585" width="140" height="110" rx="16"></rect>
       </a>
 
-      <!-- СПОРТЗАЛ -->
-      <a href="sport.html" target="_blank" rel="noopener" data-sound="sport" aria-label="Спортзал">
+      <!-- СПОРТИВНЫЙ ЗАЛ -->
+      <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934933831"
+         target="_blank" rel="noopener" data-sound="sport" data-name="Спортивный зал">
         <rect class="hotspot" x="435" y="305" width="160" height="115" rx="16"></rect>
       </a>
 
-      <!-- ЦНМТ (по центру) -->
-      <a href="rooms.html" target="_blank" rel="noopener" data-sound="rooms" aria-label="ЦНМТ">
-        <polygon class="hotspot" points="500,410 740,410 765,455 755,530 515,530 500,480"></polygon>
-      </a>
-
-      <!-- САНАТОРИЙ (новая локация) -->
-      <a href="sanatorium.html" target="_blank" rel="noopener" data-sound="sanatorium" aria-label="Санаторий">
-        <rect class="hotspot" x="415" y="585" width="235" height="60" rx="14"></rect>
+      <!-- САНАТОРИЙ ЦНМТ (центральное здание) -->
+      <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934933836"
+         target="_blank" rel="noopener" data-sound="sanatorium" data-name="Санаторий ЦНМТ">
+        <polygon class="hotspot"
+          points="500,410 740,410 765,455 755,530 515,530 500,480"></polygon>
       </a>
 
       <!-- КОСТЁР -->
-      <a href="fire.html" target="_blank" rel="noopener" data-sound="fire" aria-label="Костёр">
+      <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934933836#koster"
+         target="_blank" rel="noopener" data-sound="fire" data-name="Костёр">
         <circle class="hotspot" cx="420" cy="655" r="48"></circle>
       </a>
 
-      <!-- КОМНАТЫ ОТДЫХА -->
-      <a href="rooms.html" target="_blank" rel="noopener" data-sound="rooms" aria-label="Комнаты отдыха">
+      <!-- КОМНАТА ОТДЫХА -->
+      <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934933838"
+         target="_blank" rel="noopener" data-sound="rooms" data-name="Комната отдыха">
         <rect class="hotspot" x="735" y="630" width="210" height="100" rx="16"></rect>
       </a>
 
       <!-- КИНОЗАЛ -->
-      <a href="cinema.html" target="_blank" rel="noopener" data-sound="cinema" aria-label="Кинозал">
+      <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934933837"
+         target="_blank" rel="noopener" data-sound="cinema" data-name="Кинозал">
         <rect class="hotspot" x="855" y="450" width="165" height="100" rx="16"></rect>
       </a>
 
-      <!-- ДИСКОТЕКА -->
-      <a href="disco.html" target="_blank" rel="noopener" data-sound="disco" aria-label="Дискотека">
+      <!-- ШАГАТЕЛЬНАЯ ДИСКОТЕКА -->
+      <a href="https://my.walk-walk.ru/teach/control/stream/view/id/934933833"
+         target="_blank" rel="noopener" data-sound="disco" data-name="Шагательная дискотека">
         <rect class="hotspot" x="760" y="240" width="205" height="95" rx="16"></rect>
       </a>
     </svg>
-  </div>
 
-  <footer>Клик по зоне — страница + короткий звук. Для правки координат: Ctrl+клик по карте → координаты в консоли.</footer>
+    <div class="badge" id="badge" hidden>Режим правки</div>
+  </div>
 </div>
 
 <script>
-/* ЗВУКИ — как в оригинале + санаторий */
+/* ===== звуки (как в оригинале) ===== */
 const soundFiles = {
   kitchen:'kitchen.mp3',
   sport:'sport.mp3',
@@ -96,39 +126,141 @@ const soundFiles = {
   ducks:'ducks.mp3',
   sanatorium:'sanatorium.mp3'
 };
-
-const sounds = {};
-for (const [key, file] of Object.entries(soundFiles)) {
-  const a = new Audio(file);
-  a.preload = 'auto';
-  sounds[key] = a;
-}
-
-// Воспроизведение до 3 секунд
+const sounds={};
+for(const[k,f] of Object.entries(soundFiles)){const a=new Audio(f);a.preload='auto';sounds[k]=a;}
 document.querySelectorAll('svg a[data-sound]').forEach(a=>{
-  a.addEventListener('click', ()=>{
-    const key = a.getAttribute('data-sound');
-    const audio = sounds[key];
-    if (!audio) return;
-    try{
-      audio.currentTime = 0;
-      audio.play().catch(()=>{});
-      setTimeout(()=>{ try{ audio.pause(); }catch(_){ } }, 3000);
-    }catch(_){}
+  a.addEventListener('click',()=>{
+    const key=a.getAttribute('data-sound'); const s=sounds[key]; if(!s)return;
+    try{s.currentTime=0;s.play().catch(()=>{});setTimeout(()=>{try{s.pause();}catch(_){ }},3000);}catch(_){}
   });
 });
 
-// Ctrl+клик по карте → вывести координаты X,Y (точно по изображению)
+/* ===== режим правки: перетаскивание зон ===== */
 const svg = document.getElementById('map');
-svg.addEventListener('click', (e)=>{
-  if (!e.ctrlKey) return;
-  e.preventDefault();
-  // перевод клика в координаты viewBox
+const board = document.querySelector('.board');
+const toggleBtn = document.getElementById('toggleEdit');
+const copyBtn = document.getElementById('copyAll');
+const badge = document.getElementById('badge');
+let edit = false;
+
+toggleBtn.addEventListener('click', ()=>{
+  edit = !edit;
+  document.body.classList.toggle('edit', edit);
+  toggleBtn.setAttribute('aria-pressed', String(edit));
+  toggleBtn.textContent = 'Режим правки: ' + (edit ? 'ВЫКЛ' : 'ВКЛ');
+  badge.hidden = !edit;
+});
+
+/* перевод координат экрана в координаты SVG */
+function clientToSvg(e){
   const pt = svg.createSVGPoint();
-  pt.x = e.clientX;
-  pt.y = e.clientY;
-  const p = pt.matrixTransform(svg.getScreenCTM().inverse());
+  pt.x = (e.touches? e.touches[0].clientX : e.clientX);
+  pt.y = (e.touches? e.touches[0].clientY : e.clientY);
+  return pt.matrixTransform(svg.getScreenCTM().inverse());
+}
+
+let drag = null;
+
+svg.addEventListener('mousedown', startDrag);
+svg.addEventListener('touchstart', startDrag, {passive:false});
+svg.addEventListener('mousemove', onDrag);
+svg.addEventListener('touchmove', onDrag, {passive:false});
+window.addEventListener('mouseup', endDrag);
+window.addEventListener('touchend', endDrag);
+
+function startDrag(e){
+  if(!edit) return;
+  const target = e.target;
+  if(!(target.classList && target.classList.contains('hotspot'))) return;
+
+  e.preventDefault();
+  const p = clientToSvg(e);
+
+  drag = {
+    el: target,
+    type: target.tagName.toLowerCase(),
+    start: p,
+    // исходные атрибуты
+    x: +target.getAttribute('x')||0,
+    y: +target.getAttribute('y')||0,
+    w: +target.getAttribute('width')||0,
+    h: +target.getAttribute('height')||0,
+    cx: +target.getAttribute('cx')||0,
+    cy: +target.getAttribute('cy')||0,
+    r:  +target.getAttribute('r')||0,
+    points: target.getAttribute('points')
+  };
+}
+
+function onDrag(e){
+  if(!drag) return;
+  e.preventDefault();
+  const p = clientToSvg(e);
+  const dx = p.x - drag.start.x;
+  const dy = p.y - drag.start.y;
+
+  if(drag.type==='rect'){
+    drag.el.setAttribute('x', (drag.x + dx).toFixed(1));
+    drag.el.setAttribute('y', (drag.y + dy).toFixed(1));
+  }else if(drag.type==='circle'){
+    drag.el.setAttribute('cx', (drag.cx + dx).toFixed(1));
+    drag.el.setAttribute('cy', (drag.cy + dy).toFixed(1));
+  }else if(drag.type==='polygon'){
+    const pts = drag.points.trim().split(/\s+/).map(pt=>{
+      const [px,py]=pt.split(',').map(Number);
+      return (px+dx).toFixed(1)+','+(py+dy).toFixed(1);
+    }).join(' ');
+    drag.el.setAttribute('points', pts);
+  }
+}
+
+function endDrag(){
+  if(!drag) return;
+  // печатаем обновлённые атрибуты в консоль
+  const el = drag.el;
+  const parentA = el.closest('a');
+  const name = parentA?.dataset.name || parentA?.getAttribute('aria-label') || el.tagName;
+
+  if(drag.type==='rect'){
+    const x=el.getAttribute('x'), y=el.getAttribute('y'),
+          w=el.getAttribute('width'), h=el.getAttribute('height');
+    console.log(`[${name}] rect: x=${x}, y=${y}, width=${w}, height=${h}`);
+  }else if(drag.type==='circle'){
+    const cx=el.getAttribute('cx'), cy=el.getAttribute('cy'), r=el.getAttribute('r');
+    console.log(`[${name}] circle: cx=${cx}, cy=${cy}, r=${r}`);
+  }else if(drag.type==='polygon'){
+    const pts=el.getAttribute('points');
+    console.log(`[${name}] polygon points="${pts}"`);
+  }
+  drag = null;
+}
+
+/* Ctrl+клик — вывести X,Y под курсором (для точной разметки) */
+svg.addEventListener('click', (e)=>{
+  if(!e.ctrlKey) return;
+  const p = clientToSvg(e);
   console.log(`x=${p.x.toFixed(1)}, y=${p.y.toFixed(1)}`);
+});
+
+/* Скопировать все координаты всех зон (в буфер) */
+copyBtn.addEventListener('click', ()=>{
+  const zones = Array.from(svg.querySelectorAll('.hotspot')).map(el=>{
+    const tag = el.tagName.toLowerCase();
+    const a = el.closest('a');
+    const name = a?.dataset.name || a?.getAttribute('aria-label') || tag;
+    if(tag==='rect'){
+      return `<rect class="hotspot" x="${el.getAttribute('x')}" y="${el.getAttribute('y')}" width="${el.getAttribute('width')}" height="${el.getAttribute('height')}" rx="${el.getAttribute('rx')||0}"></rect> <!-- ${name} -->`;
+    }else if(tag==='circle'){
+      return `<circle class="hotspot" cx="${el.getAttribute('cx')}" cy="${el.getAttribute('cy')}" r="${el.getAttribute('r')}"></circle> <!-- ${name} -->`;
+    }else if(tag==='polygon'){
+      return `<polygon class="hotspot" points="${el.getAttribute('points')}"></polygon> <!-- ${name} -->`;
+    }
+    return '';
+  }).join('\n');
+  navigator.clipboard.writeText(zones).then(()=>{
+    copyBtn.textContent = 'Скопировано!';
+    setTimeout(()=>copyBtn.textContent='Скопировать координаты', 1200);
+  });
 });
 </script>
 </body>
