@@ -8,7 +8,7 @@
   html,body{height:100%;margin:0;background:#111;color:#eee;font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
   .wrap{max-width:1200px;margin:0 auto;padding:10px 12px 28px}
   .board{position:relative;background:#000;border-radius:14px;overflow:hidden;box-shadow:0 15px 40px rgba(0,0,0,.35)}
-  .board .img{display:block;width:100%;height:auto;vertical-align:top;user-select:none;pointer-events:none}
+  /* Один SVG со встроенным изображением — клики и координаты совпадают */
   svg{display:block;width:100%;height:auto}
   a{cursor:pointer;text-decoration:none}
   .hotspot{
@@ -22,51 +22,113 @@
 <body>
 <div class="wrap">
   <div class="board">
-    <img class="img" src="camp-map.jpg" alt="Карта"/>
+    <!-- ЕДИНЫЙ SVG. Внутри — картинка и зоны. -->
+    <!-- ВАЖНО: viewBox = реальный размер картинки -->
+    <svg id="map" viewBox="0 0 1139 768" preserveAspectRatio="xMidYMid meet" aria-label="Карта — кликабельные зоны">
+      <!-- Фоновая картинка (как в оригинале) -->
+      <image href="camp-map.jpg" x="0" y="0" width="1139" height="768" />
 
-    <svg viewBox="0 0 1139 768" preserveAspectRatio="xMidYMid meet" aria-label="Карта — кликабельные зоны">
-      <!-- Примеры локаций -->
-      <a href="kitchen.html" target="_blank" rel="noopener" data-sound="kitchen"><rect class="hotspot" x="190" y="205" width="230" height="110" rx="16"></rect></a>
-      <a href="ducks.html" target="_blank" rel="noopener" data-sound="ducks"><rect class="hotspot" x="100" y="355" width="260" height="120" rx="16"></rect></a>
-      <a href="relax.html" target="_blank" rel="noopener" data-sound="relax"><rect class="hotspot" x="95" y="585" width="140" height="110" rx="16"></rect></a>
-      <a href="sport.html" target="_blank" rel="noopener" data-sound="sport"><rect class="hotspot" x="435" y="305" width="160" height="115" rx="16"></rect></a>
-      <a href="rooms.html" target="_blank" rel="noopener" data-sound="rooms"><polygon class="hotspot" points="500,410 740,410 765,455 755,530 515,530 500,480"></polygon></a>
-      <a href="sanatorium.html" target="_blank" rel="noopener" data-sound="sanatorium"><rect class="hotspot" x="415" y="585" width="235" height="60" rx="14"></rect></a>
-      <a href="fire.html" target="_blank" rel="noopener" data-sound="fire"><circle class="hotspot" cx="420" cy="655" r="48"></circle></a>
-      <a href="rooms.html" target="_blank" rel="noopener" data-sound="rooms"><rect class="hotspot" x="735" y="630" width="210" height="100" rx="16"></rect></a>
-      <a href="cinema.html" target="_blank" rel="noopener" data-sound="cinema"><rect class="hotspot" x="855" y="450" width="165" height="100" rx="16"></rect></a>
-      <a href="disco.html" target="_blank" rel="noopener" data-sound="disco"><rect class="hotspot" x="760" y="240" width="205" height="95" rx="16"></rect></a>
+      <!-- СТОЛОВАЯ -->
+      <a href="kitchen.html" target="_blank" rel="noopener" data-sound="kitchen" aria-label="Столовая">
+        <rect class="hotspot" x="190" y="205" width="230" height="110" rx="16"></rect>
+      </a>
+
+      <!-- ПАЛАТЫ -->
+      <a href="ducks.html" target="_blank" rel="noopener" data-sound="ducks" aria-label="Палаты">
+        <rect class="hotspot" x="100" y="355" width="260" height="120" rx="16"></rect>
+      </a>
+
+      <!-- БЕСЕДКА -->
+      <a href="relax.html" target="_blank" rel="noopener" data-sound="relax" aria-label="Беседка">
+        <rect class="hotspot" x="95" y="585" width="140" height="110" rx="16"></rect>
+      </a>
+
+      <!-- СПОРТЗАЛ -->
+      <a href="sport.html" target="_blank" rel="noopener" data-sound="sport" aria-label="Спортзал">
+        <rect class="hotspot" x="435" y="305" width="160" height="115" rx="16"></rect>
+      </a>
+
+      <!-- ЦНМТ (по центру) -->
+      <a href="rooms.html" target="_blank" rel="noopener" data-sound="rooms" aria-label="ЦНМТ">
+        <polygon class="hotspot" points="500,410 740,410 765,455 755,530 515,530 500,480"></polygon>
+      </a>
+
+      <!-- САНАТОРИЙ (новая локация) -->
+      <a href="sanatorium.html" target="_blank" rel="noopener" data-sound="sanatorium" aria-label="Санаторий">
+        <rect class="hotspot" x="415" y="585" width="235" height="60" rx="14"></rect>
+      </a>
+
+      <!-- КОСТЁР -->
+      <a href="fire.html" target="_blank" rel="noopener" data-sound="fire" aria-label="Костёр">
+        <circle class="hotspot" cx="420" cy="655" r="48"></circle>
+      </a>
+
+      <!-- КОМНАТЫ ОТДЫХА -->
+      <a href="rooms.html" target="_blank" rel="noopener" data-sound="rooms" aria-label="Комнаты отдыха">
+        <rect class="hotspot" x="735" y="630" width="210" height="100" rx="16"></rect>
+      </a>
+
+      <!-- КИНОЗАЛ -->
+      <a href="cinema.html" target="_blank" rel="noopener" data-sound="cinema" aria-label="Кинозал">
+        <rect class="hotspot" x="855" y="450" width="165" height="100" rx="16"></rect>
+      </a>
+
+      <!-- ДИСКОТЕКА -->
+      <a href="disco.html" target="_blank" rel="noopener" data-sound="disco" aria-label="Дискотека">
+        <rect class="hotspot" x="760" y="240" width="205" height="95" rx="16"></rect>
+      </a>
     </svg>
   </div>
 
-  <footer>Кликните по зоне — откроется страница и прозвучит короткий звук.</footer>
+  <footer>Клик по зоне — страница + короткий звук. Для правки координат: Ctrl+клик по карте → координаты в консоли.</footer>
 </div>
 
 <script>
-/* ==== звуки ==== */
+/* ЗВУКИ — как в оригинале + санаторий */
 const soundFiles = {
-  kitchen:'kitchen.mp3', sport:'sport.mp3', disco:'disco.mp3',
-  rooms:'rooms.mp3', cinema:'cinema.mp3', relax:'relax.mp3',
-  fire:'fire.mp3', ducks:'ducks.mp3', sanatorium:'sanatorium.mp3'
+  kitchen:'kitchen.mp3',
+  sport:'sport.mp3',
+  disco:'disco.mp3',
+  rooms:'rooms.mp3',
+  cinema:'cinema.mp3',
+  relax:'relax.mp3',
+  fire:'fire.mp3',
+  ducks:'ducks.mp3',
+  sanatorium:'sanatorium.mp3'
 };
-const sounds={};
-for(const[k,f]of Object.entries(soundFiles)){const a=new Audio(f);a.preload='auto';sounds[k]=a;}
+
+const sounds = {};
+for (const [key, file] of Object.entries(soundFiles)) {
+  const a = new Audio(file);
+  a.preload = 'auto';
+  sounds[key] = a;
+}
+
+// Воспроизведение до 3 секунд
 document.querySelectorAll('svg a[data-sound]').forEach(a=>{
-  a.addEventListener('click',()=>{
-    const k=a.dataset.sound, s=sounds[k]; if(!s)return;
-    try{s.currentTime=0;s.play().catch(()=>{});setTimeout(()=>{try{s.pause();}catch(_){ }},3000);}catch(_){}
+  a.addEventListener('click', ()=>{
+    const key = a.getAttribute('data-sound');
+    const audio = sounds[key];
+    if (!audio) return;
+    try{
+      audio.currentTime = 0;
+      audio.play().catch(()=>{});
+      setTimeout(()=>{ try{ audio.pause(); }catch(_){ } }, 3000);
+    }catch(_){}
   });
 });
 
-/* ==== ВРЕМЕННЫЙ РЕЖИМ КООРДИНАТ (только для тебя) ==== */
-const svg=document.querySelector('svg');
-svg.addEventListener('click',e=>{
-  if(!e.ctrlKey)return; // Только Ctrl+клик
+// Ctrl+клик по карте → вывести координаты X,Y (точно по изображению)
+const svg = document.getElementById('map');
+svg.addEventListener('click', (e)=>{
+  if (!e.ctrlKey) return;
   e.preventDefault();
-  const pt=svg.createSVGPoint();
-  pt.x=e.clientX; pt.y=e.clientY;
-  const svgPt=pt.matrixTransform(svg.getScreenCTM().inverse());
-  console.log(`x=${svgPt.x.toFixed(1)}, y=${svgPt.y.toFixed(1)}`);
+  // перевод клика в координаты viewBox
+  const pt = svg.createSVGPoint();
+  pt.x = e.clientX;
+  pt.y = e.clientY;
+  const p = pt.matrixTransform(svg.getScreenCTM().inverse());
+  console.log(`x=${p.x.toFixed(1)}, y=${p.y.toFixed(1)}`);
 });
 </script>
 </body>
